@@ -9,8 +9,12 @@ pushed anywhere — both accept a local path.
 make check
 ```
 
-Runs `scripts/sync_marketplaces.py --check` (are the generated files current?) and
-`scripts/validate.py` (manifests, skills, referenced paths, version agreement).
+Runs `scripts/sync_marketplaces.py --check` (are the generated files current?),
+`scripts/validate.py` (manifests, skills, referenced paths, version agreement), and `make test`.
+
+`make test` runs `unittest` over every `plugins/*/scripts/test_*.py`, so a plugin that ships helper
+scripts gets its tests exercised by CI. A plugin with no `scripts/` directory contributes nothing
+and costs nothing.
 
 If the Claude Code CLI is installed, it has its own validator:
 

@@ -72,5 +72,6 @@ they run on the system Python that ships with macOS and on any CI image.
 | --- | --- |
 | `make validate` | Validate the marketplace and every plugin |
 | `make sync` | Regenerate the catalogs and `PLUGINS.md` |
-| `make check` | Fail on stale generated files, then validate — what CI runs |
+| `make test` | Run every `plugins/*/scripts/test_*.py` |
+| `make check` | Fail on stale generated files, then validate and test — what CI runs |
 | `make new NAME=x` | Scaffold `plugins/x` |

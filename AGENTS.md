@@ -28,7 +28,8 @@ run `make sync` and commit the result. `make check` is what CI runs.
 make new NAME=my-plugin   # scaffold from templates/plugin-template
 make validate             # manifests, skills, referenced paths, version agreement
 make sync                 # regenerate the catalogs and PLUGINS.md
-make check                # stale-file check + validate
+make test                 # run plugins/*/scripts/test_*.py
+make check                # stale-file check + validate + test
 ```
 
 Tooling is Python 3, standard library only. Do not add dependencies or a package manager without a
