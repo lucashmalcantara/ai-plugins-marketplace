@@ -1,0 +1,20 @@
+{
+  "name": "ai-plugins-marketplace",
+  "interface": {
+    "displayName": "AI Plugins Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "commit-craft",
+      "source": {
+        "source": "local",
+        "path": "./plugins/commit-craft"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "PLUGIN_NAME",
+  "displayName": "PLUGIN_DISPLAY_NAME",
+  "version": "0.1.0",
+  "description": "PLUGIN_DESCRIPTION",
+  "author": {
+    "name": "AUTHOR_NAME",
+    "url": "AUTHOR_URL"
+  },
+  "homepage": "REPO_URL/tree/main/plugins/PLUGIN_NAME",
+  "repository": "REPO_URL",
+  "license": "Apache-2.0",
+  "keywords": ["example"],
+  "skills": "./skills/"
+}

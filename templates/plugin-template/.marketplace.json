@@ -1,0 +1,14 @@
+{
+  "targets": ["claude-code", "codex"],
+  "category": "Productivity",
+  "tags": ["example"],
+  "claude": {
+    "defaultEnabled": true
+  },
+  "codex": {
+    "policy": {
+      "installation": "AVAILABLE",
+      "authentication": "ON_INSTALL"
+    }
+  }
+}

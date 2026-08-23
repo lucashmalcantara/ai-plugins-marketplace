@@ -1,0 +1,33 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generated files are in sync with plugins/
+        run: python3 scripts/sync_marketplaces.py --check
+
+      - name: Validate marketplace and plugins
+        run: python3 scripts/validate.py
+
+      - name: Validate with the Claude Code CLI
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+          for plugin in plugins/*/; do
+            if [ -d "$plugin/.claude-plugin" ]; then
+              echo "==> $plugin"
+              claude plugin validate "$plugin" --strict
+            fi
+          done
