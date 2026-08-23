@@ -86,6 +86,36 @@ def parse_frontmatter(text):
     return data
 
 
+def check_plain_scalars(where, text):
+    """Flag frontmatter values a real YAML parser would not read as written.
+
+    `parse_frontmatter` above is forgiving on purpose, but the hosts load
+    SKILL.md with actual YAML. An unquoted (plain) scalar there cannot contain
+    `: ` or ` #`, and cannot open with an indicator character: the first raises
+    a parse error that drops every frontmatter field, the second silently
+    truncates the value at what YAML reads as a comment. Both are easy to write
+    in a long `description` and invisible until a host loads the skill.
+    """
+    lines = text.splitlines()
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        return
+    block = "\n".join(lines[1:end])
+    for match in re.finditer(r"^([A-Za-z0-9_-]+):[ \t]*(.*(?:\n[ \t]+.*)*)$", block, re.M):
+        key, value = match.group(1), match.group(2)
+        if value[:1] in ('"', "'"):
+            continue  # quoted: the hazards below do not apply
+        if re.search(r":\s", value):
+            error(where, "`{}` contains `: ` outside quotes; YAML fails to parse the "
+                         "frontmatter and the skill loads with no metadata at all".format(key))
+        if re.search(r"(?<=\s)#", value):
+            error(where, "`{}` contains ` #` outside quotes; YAML reads the rest as a "
+                         "comment and silently truncates the value".format(key))
+        if value[:1] in "[]{}>|*&!%@`,":
+            error(where, "`{}` starts with the YAML indicator {!r}; quote the value".format(
+                key, value[0]))
+
+
 def check_config(config):
     where = "marketplace.config.json"
     name = config.get("name")
@@ -188,6 +218,7 @@ def check_skills(plugin):
         if front is None:
             error(where + "/SKILL.md", "missing or unterminated YAML frontmatter")
             continue
+        check_plain_scalars(where + "/SKILL.md", text)
         skill_name = front.get("name")
         if not skill_name:
             error(where + "/SKILL.md", "frontmatter has no `name`")
