@@ -1,0 +1,29 @@
+{
+  "name": "commit-craft",
+  "version": "0.1.0",
+  "description": "Turns staged changes into well-scoped Conventional Commits messages.",
+  "author": {
+    "name": "Lucas Alcantara",
+    "url": "https://github.com/lucashmalcantara"
+  },
+  "homepage": "https://github.com/lucashmalcantara/ai-plugins-marketplace/tree/main/plugins/commit-craft",
+  "repository": "https://github.com/lucashmalcantara/ai-plugins-marketplace",
+  "license": "Apache-2.0",
+  "keywords": ["git", "commits", "conventional-commits", "changelog"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Commit Craft",
+    "shortDescription": "Conventional Commits from your staged diff.",
+    "longDescription": "Reads the staged diff, splits unrelated changes into separate commits when needed, and writes Conventional Commits messages with an accurate type, scope, and body.",
+    "developerName": "Lucas Alcantara",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/lucashmalcantara/ai-plugins-marketplace",
+    "defaultPrompt": [
+      "Write a commit message for my staged changes.",
+      "Split my staged changes into logical commits.",
+      "Rewrite this commit message as a Conventional Commit."
+    ],
+    "brandColor": "#F05033"
+  }
+}

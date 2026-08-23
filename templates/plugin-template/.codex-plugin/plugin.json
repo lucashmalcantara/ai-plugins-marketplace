@@ -1,0 +1,28 @@
+{
+  "name": "PLUGIN_NAME",
+  "version": "0.1.0",
+  "description": "PLUGIN_DESCRIPTION",
+  "author": {
+    "name": "AUTHOR_NAME",
+    "url": "AUTHOR_URL"
+  },
+  "homepage": "REPO_URL/tree/main/plugins/PLUGIN_NAME",
+  "repository": "REPO_URL",
+  "license": "Apache-2.0",
+  "keywords": ["example"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PLUGIN_DISPLAY_NAME",
+    "shortDescription": "PLUGIN_DESCRIPTION",
+    "longDescription": "PLUGIN_DESCRIPTION",
+    "developerName": "AUTHOR_NAME",
+    "category": "Productivity",
+    "capabilities": ["Read"],
+    "websiteURL": "REPO_URL",
+    "defaultPrompt": [
+      "Starter prompt one.",
+      "Starter prompt two."
+    ],
+    "brandColor": "#3B82F6"
+  }
+}

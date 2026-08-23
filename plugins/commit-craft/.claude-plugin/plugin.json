@@ -1,0 +1,15 @@
+{
+  "name": "commit-craft",
+  "displayName": "Commit Craft",
+  "version": "0.1.0",
+  "description": "Turns staged changes into well-scoped Conventional Commits messages.",
+  "author": {
+    "name": "Lucas Alcantara",
+    "url": "https://github.com/lucashmalcantara"
+  },
+  "homepage": "https://github.com/lucashmalcantara/ai-plugins-marketplace/tree/main/plugins/commit-craft",
+  "repository": "https://github.com/lucashmalcantara/ai-plugins-marketplace",
+  "license": "Apache-2.0",
+  "keywords": ["git", "commits", "conventional-commits", "changelog"],
+  "skills": "./skills/"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "lucashmalcantara-plugins",
+  "interface": {
+    "displayName": "Lucas Alcantara - AI Plugins"
+  },
+  "plugins": [
+    {
+      "name": "commit-craft",
+      "source": {
+        "source": "local",
+        "path": "./plugins/commit-craft"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

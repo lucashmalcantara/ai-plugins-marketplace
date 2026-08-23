@@ -1,0 +1,38 @@
+{
+  "name": "lucashmalcantara-plugins",
+  "description": "Plugins, skills and extensions for Claude Code and Codex, published from a single source of truth.",
+  "owner": {
+    "name": "Lucas Alcantara",
+    "url": "https://github.com/lucashmalcantara"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "commit-craft",
+      "source": "./plugins/commit-craft",
+      "displayName": "Commit Craft",
+      "description": "Turns staged changes into well-scoped Conventional Commits messages.",
+      "author": {
+        "name": "Lucas Alcantara",
+        "url": "https://github.com/lucashmalcantara"
+      },
+      "homepage": "https://github.com/lucashmalcantara/ai-plugins-marketplace/tree/main/plugins/commit-craft",
+      "repository": "https://github.com/lucashmalcantara/ai-plugins-marketplace",
+      "license": "Apache-2.0",
+      "keywords": [
+        "git",
+        "commits",
+        "conventional-commits",
+        "changelog"
+      ],
+      "category": "Productivity",
+      "tags": [
+        "git",
+        "commits",
+        "conventional-commits"
+      ]
+    }
+  ]
+}
