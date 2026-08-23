@@ -14,7 +14,7 @@ PLUGIN_DESCRIPTION
 
 ```shell
 /plugin marketplace add lucashmalcantara/ai-plugins-marketplace
-/plugin install PLUGIN_NAME@ai-plugins-marketplace
+/plugin install PLUGIN_NAME@lucashmalcantara-plugins
 ```
 
 **Codex**

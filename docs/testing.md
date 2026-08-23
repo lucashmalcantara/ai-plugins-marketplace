@@ -25,7 +25,7 @@ claude plugin validate ./plugins/my-plugin --strict   # one plugin, flagging unk
 
 ```shell
 /plugin marketplace add ./            # from the repository root
-/plugin install my-plugin@ai-plugins-marketplace
+/plugin install my-plugin@lucashmalcantara-plugins
 /reload-plugins                       # if the install summary asks for it
 /my-plugin:my-skill
 ```
@@ -33,7 +33,7 @@ claude plugin validate ./plugins/my-plugin --strict   # one plugin, flagging unk
 Useful while iterating:
 
 - `/plugin details my-plugin` — component inventory and the token cost the plugin adds.
-- `/plugin marketplace update ai-plugins-marketplace` — re-read the catalog after editing it.
+- `/plugin marketplace update lucashmalcantara-plugins` — re-read the catalog after editing it.
 - Installs are cached under `~/.claude/plugins/cache`, so bump `version` (or uninstall and
   reinstall) when a change does not seem to take effect.
 

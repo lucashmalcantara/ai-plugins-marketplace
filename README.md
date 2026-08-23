@@ -14,7 +14,7 @@ See [`PLUGINS.md`](./PLUGINS.md) for what is currently published.
 
 ```shell
 /plugin marketplace add lucashmalcantara/ai-plugins-marketplace
-/plugin install commit-craft@ai-plugins-marketplace
+/plugin install commit-craft@lucashmalcantara-plugins
 ```
 
 **Codex**

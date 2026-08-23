@@ -1,7 +1,7 @@
 {
-  "name": "ai-plugins-marketplace",
+  "name": "lucashmalcantara-plugins",
   "interface": {
-    "displayName": "AI Plugins Marketplace"
+    "displayName": "Lucas Alcantara - AI Plugins"
   },
   "plugins": [
     {

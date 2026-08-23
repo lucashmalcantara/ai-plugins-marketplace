@@ -6,5 +6,5 @@
 | --- | --- | --- | --- | --- |
 | [Commit Craft](./plugins/commit-craft) | 0.1.0 | Turns staged changes into well-scoped Conventional Commits messages. | ✅ | ✅ |
 
-Install with `/plugin install <name>@ai-plugins-marketplace` in Claude Code, or enable the plugin
+Install with `/plugin install <name>@lucashmalcantara-plugins` in Claude Code, or enable the plugin
 from `/plugins` in Codex. See the [README](./README.md) for the marketplace setup step.

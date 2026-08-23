@@ -1,6 +1,6 @@
 {
-  "name": "ai-plugins-marketplace",
-  "displayName": "AI Plugins Marketplace",
+  "name": "lucashmalcantara-plugins",
+  "displayName": "Lucas Alcantara - AI Plugins",
   "description": "Plugins, skills and extensions for Claude Code and Codex, published from a single source of truth.",
   "owner": {
     "name": "Lucas Alcantara",

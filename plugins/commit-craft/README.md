@@ -15,7 +15,7 @@ and flags staged changes that should be split into separate commits.
 
 ```shell
 /plugin marketplace add lucashmalcantara/ai-plugins-marketplace
-/plugin install commit-craft@ai-plugins-marketplace
+/plugin install commit-craft@lucashmalcantara-plugins
 ```
 
 **Codex**
