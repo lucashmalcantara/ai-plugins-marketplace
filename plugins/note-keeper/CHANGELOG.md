@@ -7,6 +7,8 @@ All notable changes to this plugin are documented here. This project follows
 
 ### Added
 
+- `note-setup` skill: creates a vault in a new or existing folder, adapts a folder
+  that already holds Markdown, and optionally points Obsidian at the same layout.
 - `note` skill: creates or edits notes; the note-format source of truth.
 - `note-view` skill: displays a note in read-only mode.
 - `note-search` skill: finds notes by keyword, tag, or backlink.
@@ -17,8 +19,9 @@ All notable changes to this plugin are documented here. This project follows
 - `note-session` skill: captures live notes during an event, later distilled.
 - `note-migrate` skill: imports external Markdown notes.
 - `scripts/vault.py`: resolves the vault root from `$NOTE_KEEPER_VAULT`, a
-  `.note-keeper.json` marker, or a `notes/` folder up the tree; scaffolds a
-  new vault with `init`.
+  `.note-keeper.json` marker, or a `notes/` folder up the tree. `inspect`
+  classifies a folder without touching it, `init` creates what is missing, and
+  `obsidian` merges the Obsidian settings; all three take `--dry-run`.
 - `scripts/generate_index.py`: the deterministic index generator behind
   `note-index`.
 - Host-neutral scripts: they locate themselves from `__file__` and read only

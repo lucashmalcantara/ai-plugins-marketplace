@@ -30,15 +30,32 @@ Then enable **Note Keeper** from `/plugins`.
 
 ## Set up a vault
 
-The plugin needs to know where your vault is. Create one:
+Ask for it in plain language — "set up a note vault at ~/knowledge-base" — and the **`note-setup`**
+skill takes it from there. It inspects the folder first, shows you a plan, and writes nothing until
+you approve it. It handles a folder that does not exist yet, an empty one, an existing Obsidian
+vault, and a folder that already holds Markdown.
 
-```shell
-python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py" init ~/knowledge-base
+The layout it creates:
+
+```
+<vault>/
+├── .note-keeper.json    marker + language/timezone settings
+├── notes/               the notes, flat
+├── _attachments/        media referenced from notes and sessions
+├── _templates/          note skeletons (a starter Base.md is written)
+├── _sessions/           live capture buffers
+└── .index/              generated map — INDEX.md and cache.json
 ```
 
-That creates `notes/`, `_attachments/`, `_templates/`, `_sessions/`, `.index/`, a starter
-`_templates/Base.md`, and a `.note-keeper.json` marker. An existing vault with a `notes/` folder
-already works as-is — the marker is optional.
+The same thing without an agent:
+
+```shell
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/vault.py" inspect ~/knowledge-base   # look, change nothing
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/vault.py" init ~/knowledge-base      # create what is missing
+```
+
+Both are idempotent. An existing vault with a `notes/` folder already works as-is — the marker is
+optional.
 
 Every skill resolves the vault in this order:
 
@@ -71,6 +88,7 @@ stamped on session entries. Both are optional and default to the values above.
 
 | Skill | What it does | Writes? |
 | --- | --- | :---: |
+| `note-setup` | Create a vault, adapt an existing folder, configure Obsidian. | ✅ |
 | `note` | Create or edit a note. **Source of truth for the note format.** | ✅ |
 | `note-view` | Display a note, whole or in part. | — |
 | `note-search` | Find notes by keyword, phrase, tag, or backlink. | — |
@@ -104,6 +122,35 @@ note-remove ──cleanup──┘                                   │
                                                            │ read-only
 note-view · note-search · note-link ───────────────────────┘
 ```
+
+## Obsidian (optional)
+
+The vault is plain files, so Obsidian is a viewer over it — never a dependency. `note-setup` can
+point it at the same layout, merging into `.obsidian/` without disturbing your themes or workspace:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| `useMarkdownLinks` | `true` | **The load-bearing one.** Left alone, Obsidian writes `[[wikilinks]]`, which the note format forbids. |
+| `newLinkFormat` | `shortest` | Produces `Target.md`, exactly the form the notes use. |
+| `attachmentFolderPath` | `_attachments` | Pasted media lands where the vault expects it. |
+| `newFileLocation` + `newFileFolderPath` | `folder`, `notes` | A note you create by hand in Obsidian lands in `notes/`, so the index finds it. |
+| Templates folder | `_templates` | Obsidian offers the same skeletons the `note` skill does. |
+| `userIgnoreFilters` | adds `_sessions/` | Capture buffers stay out of search and the graph. |
+
+Three limits worth knowing before you rely on it:
+
+- **Close the vault in Obsidian before configuring it.** Obsidian rewrites `.obsidian/*.json` on
+  exit and will overwrite settings written underneath a running instance.
+- **`INDEX.md` is not visible in Obsidian.** It lives in `.index/`, and Obsidian ignores
+  dot-folders. The map is a generated artifact rather than a note, but it does mean you can only
+  read it outside Obsidian.
+- **The skills do not run on mobile.** Obsidian mobile reads and edits the same vault, and the
+  `.obsidian/` settings travel with it, so notes you write on a phone still come out in the right
+  format. But Claude Code and Codex are desktop tools: those notes join the map the next time
+  `note-index` runs on a desktop.
+
+Writing notes by hand — in Obsidian or any editor — is expected. The index keys off a content hash,
+so the next `note-index` rebuild picks up whatever appeared while you were away.
 
 ## Scripts
 

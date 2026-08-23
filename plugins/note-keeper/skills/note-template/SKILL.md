@@ -29,7 +29,7 @@ exports neither, take the directory holding this SKILL.md and go two levels up: 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
 `sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
 `timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
-`NOTE_KEEPER_VAULT`, or to run the same script with `init <path>`.
+`NOTE_KEEPER_VAULT`, or to set one up with the `note-setup` skill.
 **Never guess where the vault is.**
 
 ## Template contract (source of truth)

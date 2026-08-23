@@ -262,6 +262,132 @@ class TestWriteIndex(_VaultCase):
         self.assertNotIn("Fury", self._read(os.path.join(root, vault.INDEX_FILE)))
 
 
+class TestInspect(_VaultCase):
+    def test_missing_folder_reports_everything_as_missing(self):
+        report = vault.inspect_path(os.path.join(tempfile.mkdtemp(), "nope"))
+        self.assertFalse(report["exists"])
+        self.assertFalse(report["is_vault"])
+        self.assertIn("notes", report["missing"])
+
+    def test_existing_vault_is_recognised(self):
+        report = vault.inspect_path(self._vault({"Go.md": "corpo"}))
+        self.assertTrue(report["is_vault"])
+        self.assertTrue(report["configured"])
+        self.assertEqual(report["notes"], 1)
+
+    def test_root_docs_are_not_loose_notes(self):
+        root = self._vault()
+        for name in ("README.md", "CONTRIBUTING.md"):
+            with open(os.path.join(root, name), "w", encoding="utf-8") as handle:
+                handle.write("# doc\n")
+        self.assertEqual(vault.inspect_path(root)["loose_markdown"], [])
+
+    def test_loose_markdown_is_found_including_subfolders(self):
+        root = self._vault()
+        os.makedirs(os.path.join(root, "inbox"))
+        for rel in ("Solta.md", os.path.join("inbox", "Outra.md")):
+            with open(os.path.join(root, rel), "w", encoding="utf-8") as handle:
+                handle.write("x\n")
+        self.assertEqual(vault.inspect_path(root)["loose_markdown"],
+                         ["Solta.md", os.path.join("inbox", "Outra.md")])
+
+    def test_notes_and_support_folders_are_not_loose(self):
+        root = self._vault({"Go.md": "corpo"})
+        os.makedirs(os.path.join(root, "_templates"), exist_ok=True)
+        with open(os.path.join(root, "_templates", "Base.md"), "w", encoding="utf-8") as h:
+            h.write("## x\n")
+        self.assertEqual(vault.inspect_path(root)["loose_markdown"], [])
+
+
+class TestObsidian(_VaultCase):
+    def _plugins(self, root, data):
+        os.makedirs(os.path.join(root, vault.OBSIDIAN_DIR), exist_ok=True)
+        path = os.path.join(root, vault.OBSIDIAN_DIR, "core-plugins.json")
+        with open(path, "w", encoding="utf-8") as handle:
+            json.dump(data, handle)
+        return path
+
+    def test_plan_changes_nothing_on_disk(self):
+        root = self._vault()
+        self.assertTrue(vault.obsidian_plan(root))
+        self.assertFalse(os.path.isdir(os.path.join(root, vault.OBSIDIAN_DIR)))
+
+    def test_markdown_links_are_forced_on(self):
+        # Left at its default Obsidian writes [[wikilinks]], which the note
+        # format forbids — this is the load-bearing setting.
+        keys = {c["key"]: c["to"] for c in vault.obsidian_plan(self._vault())}
+        self.assertIs(keys["useMarkdownLinks"], True)
+        self.assertEqual(keys["newLinkFormat"], "shortest")
+        self.assertEqual(keys["attachmentFolderPath"], "_attachments")
+        self.assertEqual(keys["newFileFolderPath"], "notes")
+
+    def test_configure_then_replan_is_empty(self):
+        root = self._vault()
+        vault.configure_obsidian(root)
+        self.assertEqual(vault.obsidian_plan(root), [])
+
+    def test_existing_app_settings_are_merged_not_replaced(self):
+        root = self._vault()
+        os.makedirs(os.path.join(root, vault.OBSIDIAN_DIR))
+        app = os.path.join(root, vault.OBSIDIAN_DIR, "app.json")
+        with open(app, "w", encoding="utf-8") as handle:
+            json.dump({"theme": "obsidian", "userIgnoreFilters": ["private/"]}, handle)
+        vault.configure_obsidian(root)
+        with open(app, encoding="utf-8") as handle:
+            merged = json.load(handle)
+        self.assertEqual(merged["theme"], "obsidian")
+        self.assertEqual(merged["userIgnoreFilters"], ["private/", "_sessions/"])
+
+    def test_core_plugins_is_never_authored_from_scratch(self):
+        # A file holding only `templates` would read as "every other core
+        # plugin is off"; Obsidian enables Templates by default anyway.
+        root = self._vault()
+        vault.configure_obsidian(root)
+        self.assertFalse(os.path.isfile(
+            os.path.join(root, vault.OBSIDIAN_DIR, "core-plugins.json")))
+
+    def test_existing_core_plugins_map_keeps_its_other_entries(self):
+        root = self._vault()
+        path = self._plugins(root, {"graph": True, "templates": False})
+        vault.configure_obsidian(root)
+        with open(path, encoding="utf-8") as handle:
+            plugins = json.load(handle)
+        self.assertEqual(plugins, {"graph": True, "templates": True})
+
+    def test_legacy_core_plugins_list_is_appended_to(self):
+        root = self._vault()
+        path = self._plugins(root, ["file-explorer", "graph"])
+        vault.configure_obsidian(root)
+        with open(path, encoding="utf-8") as handle:
+            self.assertEqual(json.load(handle), ["file-explorer", "graph", "templates"])
+
+    def test_a_file_with_nothing_to_change_is_not_rewritten(self):
+        # Rewriting core-plugins.json to change none of its thirty entries is
+        # churn in the user's diff, and contradicts "merged, never replaced".
+        root = self._vault()
+        path = self._plugins(root, {"graph": True, "templates": True})
+        before = self._read(path)
+        stamp = os.stat(path).st_mtime_ns
+        vault.configure_obsidian(root)
+        self.assertEqual(self._read(path), before)
+        self.assertEqual(os.stat(path).st_mtime_ns, stamp)
+
+    def test_configuring_twice_rewrites_nothing_the_second_time(self):
+        root = self._vault()
+        vault.configure_obsidian(root)
+        app = os.path.join(root, vault.OBSIDIAN_DIR, "app.json")
+        stamp = os.stat(app).st_mtime_ns
+        self.assertEqual(vault.configure_obsidian(root), [])
+        self.assertEqual(os.stat(app).st_mtime_ns, stamp)
+
+    def test_unreadable_config_does_not_crash_the_plan(self):
+        root = self._vault()
+        os.makedirs(os.path.join(root, vault.OBSIDIAN_DIR))
+        with open(os.path.join(root, vault.OBSIDIAN_DIR, "app.json"), "w") as handle:
+            handle.write("{ not json")
+        self.assertTrue(vault.obsidian_plan(root))
+
+
 class TestHostAgnostic(unittest.TestCase):
     """The scripts must not know which agent host is running them.
 
