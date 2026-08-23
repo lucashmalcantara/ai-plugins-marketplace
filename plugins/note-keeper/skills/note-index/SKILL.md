@@ -10,7 +10,7 @@ description: Regenerate INDEX.md for the note-keeper vault — a full rebuild, o
 Regenerates `INDEX.md` in `.index/`: one line per note, alphabetical, with a summary, tags, and
 relationships. The heavy lifting (parsing tags/links, hashing, diffing against the cache, deciding
 which notes still need a summary, rendering the file) is done by the deterministic generator script
-shipped with this plugin at `${CLAUDE_PLUGIN_ROOT}/scripts/generate_index.py`. This skill's job is to
+shipped with this plugin at `scripts/generate_index.py` in the plugin root. This skill's job is to
 run that script and supply the one thing it can't produce itself: the LLM-written summary for each
 new or changed note.
 
@@ -25,13 +25,17 @@ not restate them. It only reads note bodies to summarize them.
 Every path below is relative to the **vault root**. Resolve it once, before anything else:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/vault.py"
+python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py"
 ```
+
+Those two variables are what today's hosts call this plugin's own install directory. On a host that
+exports neither, take the directory holding this SKILL.md and go two levels up: the scripts live at
+`scripts/` in the plugin root, and they read no host variable themselves.
 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
 `sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
 `timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
-`NOTE_KEEPER_VAULT`, or to run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/vault.py" init <path>`.
+`NOTE_KEEPER_VAULT`, or to run the same script with `init <path>`.
 **Never guess where the vault is.**
 
 Pass that `root` to the generator explicitly with `--root` in every call below, so the run never
@@ -41,7 +45,7 @@ depends on the working directory.
 
 1. **Scan.** Run:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/generate_index.py" --root "<root>" scan
+   python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/generate_index.py" --root "<root>" scan
    ```
    This prints a JSON array with one entry per note under `notes/` (`title`, `path`, `tags`,
    `relationships`, `hash`, `summary`, `needs_summary`). Notes whose content hash matches the cache
@@ -61,7 +65,7 @@ depends on the working directory.
 
 4. **Write.** Run:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/generate_index.py" --root "<root>" write --summaries <temp.json>
+   python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/generate_index.py" --root "<root>" write --summaries <temp.json>
    ```
    This re-scans, merges the new summaries with the cached ones, writes `.index/INDEX.md`, and
    updates `.index/cache.json`. It exits with an error if any entry is still missing a summary — if

@@ -21,3 +21,8 @@ All notable changes to this plugin are documented here. This project follows
   new vault with `init`.
 - `scripts/generate_index.py`: the deterministic index generator behind
   `note-index`.
+- Host-neutral scripts: they locate themselves from `__file__` and read only
+  `NOTE_KEEPER_VAULT`, enforced by a test. The one host-specific detail is the
+  line each skill uses to resolve the plugin root,
+  `${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}`, with a documented fallback for a host
+  that exports neither.

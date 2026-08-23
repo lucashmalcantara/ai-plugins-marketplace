@@ -33,7 +33,7 @@ Then enable **Note Keeper** from `/plugins`.
 The plugin needs to know where your vault is. Create one:
 
 ```shell
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/vault.py" init ~/knowledge-base
+python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py" init ~/knowledge-base
 ```
 
 That creates `notes/`, `_attachments/`, `_templates/`, `_sessions/`, `.index/`, a starter
@@ -107,7 +107,7 @@ note-view · note-search · note-link ──────────────
 
 ## Scripts
 
-Both are stdlib-only Python and are invoked by the skills through `${CLAUDE_PLUGIN_ROOT}`.
+Both are stdlib-only Python.
 
 - **`scripts/vault.py`** — resolves the vault and its settings, printing them as JSON; `init`
   scaffolds a new one.
@@ -121,6 +121,26 @@ Run their tests with:
 ```shell
 python3 -m unittest discover -s plugins/note-keeper/scripts -p 'test_*.py'
 ```
+
+### Host portability
+
+Nothing host-specific reaches the scripts. They locate their own directory from `__file__` and read
+exactly one environment variable, `NOTE_KEEPER_VAULT`, which belongs to this plugin rather than to
+any host. A test enforces that.
+
+The one thing that cannot be host-neutral is the *first* path: a skill body has to name the plugin's
+install directory before it can run anything from it, and only the host knows where that is. So the
+skills open with a single line:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py"
+```
+
+Claude Code exports `CLAUDE_PLUGIN_ROOT`; Codex exports `PLUGIN_ROOT` and `CLAUDE_PLUGIN_ROOT` as an
+alias. A host that exports neither still works: each skill says to take its own SKILL.md directory
+and go two levels up. Supporting a new provider therefore means adding one name to that expression —
+not touching the scripts, and not changing how any skill behaves. The current mapping lives in
+[`docs/compatibility.md`](../../docs/compatibility.md).
 
 ## Behaviour notes
 

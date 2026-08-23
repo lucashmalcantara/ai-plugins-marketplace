@@ -93,8 +93,12 @@ knows, so writing the trailer is that agent's job.
   skip updates when the version string is unchanged.
 - A plugin's `name` and the marketplace `name` are stable identifiers. Renaming either breaks
   existing installs; see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
-- Prefer `${CLAUDE_PLUGIN_ROOT}` in hooks, scripts, and MCP configs — it is the only root variable
-  both hosts define.
+- Use `${CLAUDE_PLUGIN_ROOT}` in hooks and MCP configs — the host expands those itself, and it is
+  the only root variable both hosts define. In a **skill body**, write
+  `${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}` instead and state the no-variable fallback, so the skill
+  survives a host that is in neither column yet. Scripts should locate themselves from `__file__`
+  and read only variables the plugin defines. See [`docs/compatibility.md`](./docs/compatibility.md),
+  which owns the mapping.
 - Skill `description` frontmatter must say when to use *and when not to use* the skill; it is the
   only text an agent sees before loading the skill.
 - Documentation and plugin content are written in English.

@@ -262,6 +262,35 @@ class TestWriteIndex(_VaultCase):
         self.assertNotIn("Fury", self._read(os.path.join(root, vault.INDEX_FILE)))
 
 
+class TestHostAgnostic(unittest.TestCase):
+    """The scripts must not know which agent host is running them.
+
+    Host knowledge belongs in one line of each SKILL.md, where a fallback can
+    be written; a script that reached for CLAUDE_PLUGIN_ROOT or PLUGIN_ROOT
+    would push that knowledge into the implementation and break on a host that
+    exports neither. See the plugin README, "Host portability".
+    """
+
+    MODULES = (VAULT_SCRIPT, INDEX_SCRIPT)
+
+    def test_no_host_variables_are_read(self):
+        for path in self.MODULES:
+            with open(path, encoding="utf-8") as handle:
+                source = handle.read()
+            for name in ("CLAUDE_PLUGIN_ROOT", "PLUGIN_ROOT", "CLAUDE_PROJECT_DIR"):
+                self.assertNotIn(name, source, "{} references {}".format(
+                    os.path.basename(path), name))
+
+    def test_only_the_plugin_s_own_variable_is_read(self):
+        self.assertEqual(vault.ENV_VAR, "NOTE_KEEPER_VAULT")
+
+    def test_scripts_locate_themselves(self):
+        # generate_index.py imports vault.py as a sibling, so it must derive its
+        # own directory rather than rely on the caller's cwd or sys.path.
+        with open(INDEX_SCRIPT, encoding="utf-8") as handle:
+            self.assertIn("__file__", handle.read())
+
+
 class TestCommandLine(_VaultCase):
     def _run(self, script, args, env=None):
         environment = dict(os.environ)

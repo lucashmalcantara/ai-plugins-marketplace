@@ -26,13 +26,17 @@ scope guard as the `note-index` skill).
 Every path below is relative to the **vault root**. Resolve it once, before anything else:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/vault.py"
+python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py"
 ```
+
+Those two variables are what today's hosts call this plugin's own install directory. On a host that
+exports neither, take the directory holding this SKILL.md and go two levels up: the scripts live at
+`scripts/` in the plugin root, and they read no host variable themselves.
 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
 `sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
 `timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
-`NOTE_KEEPER_VAULT`, or to run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/vault.py" init <path>`.
+`NOTE_KEEPER_VAULT`, or to run the same script with `init <path>`.
 **Never guess where the vault is.**
 
 ## When to use (vs. the `note-link` skill)
