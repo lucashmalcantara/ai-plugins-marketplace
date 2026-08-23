@@ -219,6 +219,13 @@ def check_skills(plugin):
             error(where + "/SKILL.md", "missing or unterminated YAML frontmatter")
             continue
         check_plain_scalars(where + "/SKILL.md", text)
+        # A skill body is prose an agent reads and runs, so unlike a hook or an
+        # .mcp.json it is never expanded by the host and can carry a fallback.
+        # See docs/compatibility.md.
+        if "CLAUDE_PLUGIN_ROOT" in text and "CLAUDE_PLUGIN_ROOT:-" not in text:
+            warn(where + "/SKILL.md",
+                 "names `CLAUDE_PLUGIN_ROOT` with no fallback; in a skill body prefer "
+                 "`${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}` so a third host still resolves it")
         skill_name = front.get("name")
         if not skill_name:
             error(where + "/SKILL.md", "frontmatter has no `name`")

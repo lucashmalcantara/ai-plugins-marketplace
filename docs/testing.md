@@ -58,4 +58,6 @@ Then open `/plugins` in Codex, enable the plugin, start a new session, and invok
 - It does not fire on unrelated requests.
 - Every command in the skill body runs as written on a clean checkout.
 - Hooks and MCP servers resolve their paths through `${CLAUDE_PLUGIN_ROOT}`, not relative paths.
+- Skill bodies use the fallback form `${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}` and say what to do when
+  neither is set; `make validate` warns when one does not.
 - The plugin behaves the same on both hosts, or its README says where it differs.
