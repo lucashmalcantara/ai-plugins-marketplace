@@ -156,7 +156,12 @@ OBSIDIAN_DIR = ".obsidian"
 OBSIDIAN_APP = {
     "attachmentFolderPath": FOLDERS["attachments"],
     "useMarkdownLinks": True,
-    "newLinkFormat": "shortest",
+    # "relative", not "shortest": shortest writes a bare filename that only
+    # Obsidian's own index can resolve, so an attachment embed points at
+    # notes/<file> and breaks everywhere else. Relative gives "Note 1.md" for
+    # a sibling note and "../_attachments/x.png" for media — both exactly the
+    # forms the note format specifies.
+    "newLinkFormat": "relative",
     "newFileLocation": "folder",
     "newFileFolderPath": FOLDERS["notes"],
 }

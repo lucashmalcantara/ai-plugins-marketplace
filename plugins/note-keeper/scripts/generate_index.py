@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -51,7 +52,11 @@ def extract_relationships(body):
     cleaned = _INLINE_CODE_RE.sub(" ", _FENCE_RE.sub(" ", body))
     rels = []
     for match in _MD_LINK_RE.finditer(cleaned):
-        dest = (match.group(1) or match.group(2)).strip()
+        # The note format asks for `<Angle Brackets.md>`, but a note written by
+        # hand in another editor is just as likely to arrive percent-encoded —
+        # Obsidian writes `Note%201.md`. Both name the same note, so decode
+        # before taking the title, or the relationship lands under a mangled key.
+        dest = urllib.parse.unquote((match.group(1) or match.group(2)).strip())
         if not dest.lower().endswith(".md"):
             continue
         title = dest.rsplit("/", 1)[-1][:-3]

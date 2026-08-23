@@ -92,6 +92,21 @@ class TestExtractRelationships(unittest.TestCase):
     def test_duplicates_collapse_keeping_order(self):
         self.assertEqual(extract_relationships("[a](A.md) [b](B.md) [a2](A.md)"), ["A", "B"])
 
+    def test_percent_encoded_destination_is_decoded(self):
+        # What Obsidian writes for a spaced filename. Left encoded, the
+        # relationship lands under "Note%201" and no backlink search finds it.
+        self.assertEqual(extract_relationships("[Note 1](Note%201.md)"), ["Note 1"])
+
+    def test_percent_encoded_and_bracketed_forms_agree(self):
+        encoded = extract_relationships("[x](Repasse%20de%20Custos.md)")
+        bracketed = extract_relationships("[x](<Repasse de Custos.md>)")
+        self.assertEqual(encoded, bracketed)
+        self.assertEqual(encoded, ["Repasse de Custos"])
+
+    def test_encoded_and_bracketed_links_to_one_note_collapse(self):
+        self.assertEqual(
+            extract_relationships("[a](<Note 1.md>) e [b](Note%201.md)"), ["Note 1"])
+
 
 class TestRender(unittest.TestCase):
     def test_line_carries_summary_tags_and_relationships(self):
@@ -317,9 +332,12 @@ class TestObsidian(_VaultCase):
         # format forbids — this is the load-bearing setting.
         keys = {c["key"]: c["to"] for c in vault.obsidian_plan(self._vault())}
         self.assertIs(keys["useMarkdownLinks"], True)
-        self.assertEqual(keys["newLinkFormat"], "shortest")
         self.assertEqual(keys["attachmentFolderPath"], "_attachments")
         self.assertEqual(keys["newFileFolderPath"], "notes")
+        # Not "shortest": that writes a bare filename only Obsidian's own index
+        # can resolve, so an attachment embed points at notes/<file> and breaks
+        # in every other Markdown reader.
+        self.assertEqual(keys["newLinkFormat"], "relative")
 
     def test_configure_then_replan_is_empty(self):
         root = self._vault()

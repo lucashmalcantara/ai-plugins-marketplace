@@ -106,7 +106,7 @@ What gets configured, and why each one matters:
 | Setting | Value | Why |
 | --- | --- | --- |
 | `useMarkdownLinks` | `true` | **The load-bearing one.** Left alone, Obsidian writes `[[wikilinks]]`, which the note format forbids. |
-| `newLinkFormat` | `shortest` | Produces `Target.md` — exactly the form the `note` skill specifies. |
+| `newLinkFormat` | `relative` | Gives `Target.md` for a sibling note and `../_attachments/x.png` for media. `shortest` writes a bare filename that only Obsidian's index resolves, so the embed breaks outside it. |
 | `attachmentFolderPath` | `_attachments` | Pasted media lands where the vault expects it. |
 | `newFileLocation` + `newFileFolderPath` | `folder`, `notes` | A note created by hand in Obsidian lands in `notes/`, so the index picks it up. |
 | Templates folder | `_templates` | The core Templates plugin offers the same skeletons the `note` skill does. |

@@ -7,7 +7,7 @@ connections, not in a folder hierarchy.
 
 | | |
 | --- | --- |
-| Components | 9 skills, 2 scripts |
+| Components | 10 skills, 2 scripts |
 | Works on | Claude Code, Codex |
 | Requires | Python 3.9+; `ripgrep` optional (falls back to `grep`) |
 
@@ -131,7 +131,7 @@ point it at the same layout, merging into `.obsidian/` without disturbing your t
 | Setting | Value | Why |
 | --- | --- | --- |
 | `useMarkdownLinks` | `true` | **The load-bearing one.** Left alone, Obsidian writes `[[wikilinks]]`, which the note format forbids. |
-| `newLinkFormat` | `shortest` | Produces `Target.md`, exactly the form the notes use. |
+| `newLinkFormat` | `relative` | Gives `Target.md` for a sibling note and `../_attachments/x.png` for media — the two forms the note format specifies. `shortest` writes a bare filename only Obsidian can resolve. |
 | `attachmentFolderPath` | `_attachments` | Pasted media lands where the vault expects it. |
 | `newFileLocation` + `newFileFolderPath` | `folder`, `notes` | A note you create by hand in Obsidian lands in `notes/`, so the index finds it. |
 | Templates folder | `_templates` | Obsidian offers the same skeletons the `note` skill does. |
