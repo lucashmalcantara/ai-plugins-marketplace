@@ -1,0 +1,15 @@
+{
+  "name": "note-keeper",
+  "displayName": "Note Keeper",
+  "version": "0.1.0",
+  "description": "Personal knowledge vault of plain-Markdown notes: create, view, search, link, index, and distil them.",
+  "author": {
+    "name": "Lucas Alcantara",
+    "url": "https://github.com/lucashmalcantara"
+  },
+  "homepage": "https://github.com/lucashmalcantara/ai-plugins-marketplace/tree/main/plugins/note-keeper",
+  "repository": "https://github.com/lucashmalcantara/ai-plugins-marketplace",
+  "license": "Apache-2.0",
+  "keywords": ["notes", "knowledge-base", "markdown", "obsidian", "pkm"],
+  "skills": "./skills/"
+}
