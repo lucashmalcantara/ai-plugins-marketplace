@@ -53,10 +53,15 @@ Accept either:
 - **A folder** — walk it **recursively** for `*.md` files, or
 - **Specific files** — one or more `.md` paths the user names.
 
-**Ignore in the source** (never treated as notes): `.obsidian/`, `.trash/`, `_templates/`, and
-similar non-note directories (any dotted/hidden dir, `.git/`, editor/plugin config folders). Media
-files (images, PDFs, etc.) are not notes either — they are only relevant when an embed references
-them (see Conversions).
+**Ignore in the source** (never treated as notes): `.obsidian/`, `.trash/`, `_templates/`,
+`_attachments/` (and whatever else the source calls its media folder — `attachments/`, `assets/`,
+`files/`), and similar non-note directories (any dotted/hidden dir, `.git/`, editor/plugin config
+folders). Media files (images, PDFs, etc.) are not notes either — they are only relevant when an
+embed references them (see Conversions).
+
+A media folder can hold `.md` files that are **assets, not notes** — an Excalidraw drawing is a
+`.md` file, and so are some plugin sidecars. Anything inside the media folder is an asset no matter
+its extension. Never let a recursive `*.md` walk pull one in as a note.
 
 If a named source path is outside the vault, good — that's expected. If the user points at the vault
 itself, stop and ask; this skill imports *external* notes.
@@ -93,6 +98,21 @@ tags, and relationships) to find an existing vault note **on the same topic** as
 Multiple source notes may map into the **same** existing or new vault note (consolidation) — say so
 explicitly in the plan.
 
+**A source note with an empty body is still a decision.** A vault that grew in another tool
+accumulates notes that are nothing but frontmatter — a title someone linked to before writing it.
+The body is empty, but the note is not worthless: its **title and its inbound links are the
+content**, and dropping it silently deletes a piece of the graph the user built. Classify each one:
+
+- **It has inbound links, outbound `rel:`, or both** — keep it, as a note whose body carries only
+  those relationships, written from what the rest of the corpus already states (`Rayane` is named as
+  Railda's daughter in Railda's note). Restating an existing fact is not invention; asserting a new
+  one is. If nothing in the corpus says anything about it, keep the note with just its links.
+- **It has no links in either direction and no body** — nothing survives it. Propose dropping it,
+  and list it in the plan under what will not be migrated.
+
+List every empty note in the plan with the branch you chose, so the user can overrule the policy in
+one place rather than note by note.
+
 ## Step 3 — Plan the conversions (per note)
 
 For each destination, work out how the source content becomes vault-format content. **Resulting
@@ -107,11 +127,35 @@ notes have NO frontmatter** — everything meaningful moves inline; the rest is 
   exist in the vault yet is acceptable — it flags a topic to develop. Link mechanics (no `notes/`
   prefix; angle brackets around spaced filenames) follow the `note` skill's link rules — don't
   restate them, apply them.
+- **A wikilink carrying `#` points at a heading, not at a note.** Two forms, and the difference
+  matters because treating either as a plain note link sends the reader to the wrong file:
+  - `[[#Anexo 1]]` — **same note**. It becomes an ordinary anchor: `[Anexo 1](#anexo-1)`. It is not
+    a relationship at all, so it never turns into a note link and never counts as a link to develop.
+  - `[[Nota#Seção]]` — another note's heading: `[Seção](<Nota.md#seção>)`. This *is* a relationship.
+
+  Slugify the anchor the way the destination renders headings (lowercase, spaces to `-`), and
+  remember that a split can move the target heading into a different note — resolve the anchor
+  against the plan, not against the source.
 - **Embeds → Markdown images + copied media.** `![[image.png]]` → `![](<../_attachments/image.png>)`.
   **Copy** the referenced media file from the source into `_attachments/` (paths from a note in
   `notes/` reach it as `../_attachments/…`). Copying — never moving — keeps the source read-only. If
   the referenced media can't be found in the source, keep the link but flag the missing file in the
-  plan.
+  plan. Three shapes the naive `![[name.ext]]` reading gets wrong:
+  - **A path prefix.** `![[_attachments/image.png]]` names the same file as `![[image.png]]` — the
+    wikilink target is resolved by *basename*, not by the path written. Take the basename, then
+    rebuild the destination as `../_attachments/<basename>`; never carry the source prefix through.
+  - **An alias.** `![[image.png|Diagrama do fluxo]]` → `![Diagrama do fluxo](<../_attachments/image.png>)`.
+    The text after `|` is the caption — it becomes the image's alt text. Dropping it loses the only
+    description the image has.
+  - **An accented name that compares unequal to itself.** macOS stores filenames decomposed and
+    hands them back that way, while the name written inside the note is composed — `Técnica` is one
+    code point in the note and two on disk. Normalize both sides to NFC before matching, or every
+    accented attachment reports as missing while sitting right there in the folder.
+  - **A target that isn't an image, or carries no extension.** `![[drawing.excalidraw]]` embeds an
+    editor-specific asset that renders only in the source app, and the file on disk may be
+    `drawing.excalidraw.md`. Resolve it by basename *and* by basename plus each extension present in
+    the media folder. Copy the asset, but link it as a **plain link**, not an image — `![](…)` on a
+    non-image renders as a broken image everywhere. Flag in the plan that it needs the original app.
 - **Frontmatter `tags:` → inline `#tags`.** Emit them inline in the body (a trailing `#tag #tag`
   line is fine, per the `note` skill).
 - **Apply the vault's writing conventions:** body written in the vault's configured `language`
@@ -206,6 +250,15 @@ rebuild in Step 2 happens earlier, before any writes). Do not hand-edit
   `rel:`/wikilinks → inline links, everything else discarded — and the discards are reported.
 - **Leaving wikilinks or embeds unconverted** — `[[…]]` → `[text](<Target.md>)`, `![[…]]` →
   `![](<../_attachments/…>)` with the media copied in.
+- **Reading an embed as `![[basename.ext]]` and nothing else** — a path prefix must be stripped, an
+  `|alias` must survive as alt text, and a non-image asset must become a plain link rather than an
+  image that renders broken.
+- **Turning `[[#Heading]]` into a note link** — it points inside the current note. It becomes
+  `[Heading](#heading)`; only `[[Note#Heading]]` is a relationship.
+- **Walking `*.md` recursively without excluding the media folder** — an Excalidraw drawing is a
+  `.md` file, and it is an asset, not a note.
+- **Dropping empty source notes silently** — their title and inbound links are the content; decide
+  per note and report the decision.
 - **Prefixing links with `notes/`** or forgetting angle brackets around spaced filenames — follow
   the `note` skill's link rules exactly.
 - **Hand-editing `INDEX.md`** or skipping the full rebuild after writing — route indexing through

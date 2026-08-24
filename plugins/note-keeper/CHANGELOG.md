@@ -17,7 +17,13 @@ All notable changes to this plugin are documented here. This project follows
 - `note-index` skill: regenerates `INDEX.md`.
 - `note-template` skill: creates or converts a note template.
 - `note-session` skill: captures live notes during an event, later distilled.
-- `note-migrate` skill: imports external Markdown notes.
+- `note-migrate` skill: imports external Markdown notes, consolidating by topic.
+  Covers the wikilink shapes a real vault produces — embeds carrying a path
+  prefix or an `|alias`, non-image assets with no extension in the link, and
+  `[[#Heading]]` anchors that point inside the note rather than at another one —
+  excludes the source's media folder from the note walk (an Excalidraw drawing is
+  a `.md` file), and decides empty source notes by their inbound links instead of
+  dropping them silently.
 - `scripts/vault.py`: resolves the vault root from `$NOTE_KEEPER_VAULT`, a
   `.note-keeper.json` marker, or a `notes/` folder up the tree. `inspect`
   classifies a folder without touching it, `init` creates what is missing, and
