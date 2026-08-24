@@ -38,6 +38,9 @@ A note is a **pure Markdown file with no frontmatter** — the file is just its 
   still work via angle brackets — see links below).
 - **Body is in the vault's `language`** (default `pt-BR`). Terms foreign to that language — English
   terms in a pt-BR vault — are written in _italics_ (e.g. _trade-off_, _deadline_).
+  Use `*asterisks*` instead when the emphasized span ends in a URL or already contains `_`: an
+  underscore is not a closer directly after a word character, so `_…?si=1J1W6_tKsB5nzg5p_` pairs its
+  markers inside the URL and both the emphasis and the link come out wrong.
 - **Tags are inline `#tag`**, written directly in the body wherever relevant. A trailing line of
   tags at the end of the note is a fine convention:
   ```markdown
@@ -72,6 +75,12 @@ A note is a **pure Markdown file with no frontmatter** — the file is just its 
   - **Wrap the destination in angle brackets `<...>`** whenever the filename has a space (or other
     characters CommonMark can't take unbracketed) — `[text](<Other Note.md>)`. This is required, not
     optional: an unbracketed destination cannot contain spaces.
+  - **A `#` in the title must be written `%23` in the destination.** Angle brackets do not save it:
+    the destination is still read as a URL, so `<Tipos em C#.md>` resolves to the file `Tipos em C`
+    with the fragment `.md`, and the link silently goes nowhere. Write
+    `[Tipos em C#](<Tipos em C%23.md>)` — the link *text* keeps the real `#`, only the destination
+    encodes it. This is what Obsidian writes on its own, and the index generator percent-decodes,
+    so both ends agree.
   - A link to a note that doesn't exist yet is acceptable — it flags a topic to develop later.
 
 No other metadata exists. Do not add frontmatter, a `title:` field, a `tags:` list, or a `rel:`
@@ -156,6 +165,9 @@ Resolve which workflow to run before writing:
   go stale otherwise.
 - Introducing new filenames with parentheses — avoid them going forward, even though angle brackets
   make existing ones work.
+- Linking to a title containing `#` without encoding it as `%23` — the destination is parsed as a
+  URL, so everything from the `#` on becomes a fragment and the link resolves to nothing. The
+  failure is silent: the link renders normally and simply leads nowhere.
 - Writing content into a note without confirming the destination when none was referenced — propose
   the target (an existing note on the topic, or a new one) and confirm first, so content doesn't
   land in the wrong note.

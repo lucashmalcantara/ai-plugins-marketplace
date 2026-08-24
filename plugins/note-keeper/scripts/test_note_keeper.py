@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -86,6 +87,13 @@ class TestExtractRelationships(unittest.TestCase):
     def test_attachment_paths_are_reduced_to_the_filename(self):
         self.assertEqual(extract_relationships("[x](<../notes/Outra Nota.md>)"), ["Outra Nota"])
 
+    def test_a_markdown_attachment_is_not_a_relationship(self):
+        # An Excalidraw drawing is a .md file living in _attachments/. A note
+        # embedding one references an asset, not a note — counted as a
+        # relationship it points at a note that will never exist.
+        self.assertEqual(
+            extract_relationships("[Diagrama](<../_attachments/desenho.excalidraw.md>)"), [])
+
     def test_links_in_code_are_ignored(self):
         self.assertEqual(extract_relationships("`[x](Y.md)`"), [])
 
@@ -97,6 +105,14 @@ class TestExtractRelationships(unittest.TestCase):
         # relationship lands under "Note%201" and no backlink search finds it.
         self.assertEqual(extract_relationships("[Note 1](Note%201.md)"), ["Note 1"])
 
+    def test_decomposed_and_composed_titles_agree(self):
+        # macOS hands filenames back decomposed; a link typed into a note body
+        # arrives composed. Both name "Técnica" and must yield one title.
+        composed = extract_relationships("[x](<" + unicodedata.normalize("NFC", "Técnica") + ".md>)")
+        decomposed = extract_relationships("[x](<" + unicodedata.normalize("NFD", "Técnica") + ".md>)")
+        self.assertEqual(composed, decomposed)
+        self.assertEqual(composed, [unicodedata.normalize("NFC", "Técnica")])
+
     def test_percent_encoded_and_bracketed_forms_agree(self):
         encoded = extract_relationships("[x](Repasse%20de%20Custos.md)")
         bracketed = extract_relationships("[x](<Repasse de Custos.md>)")
@@ -106,6 +122,19 @@ class TestExtractRelationships(unittest.TestCase):
     def test_encoded_and_bracketed_links_to_one_note_collapse(self):
         self.assertEqual(
             extract_relationships("[a](<Note 1.md>) e [b](Note%201.md)"), ["Note 1"])
+
+
+class TestRenderSeparators(unittest.TestCase):
+    def test_relationships_are_separated_so_a_comma_in_a_title_survives(self):
+        # "Preposições in, on e at" is a legal filename. Joined with ", " the
+        # list reads back as three different notes.
+        line = format_line({
+            "title": "Inglês", "path": "notes/Inglês.md", "summary": "hub",
+            "tags": [], "relationships": ["Preposições in, on e at", "Often"]})
+        self.assertIn("relationships: Preposições in, on e at / Often", line)
+        self.assertEqual(
+            line.split("relationships: ")[1].split(" / "),
+            ["Preposições in, on e at", "Often"])
 
 
 class TestRender(unittest.TestCase):
@@ -221,6 +250,19 @@ class TestScan(_VaultCase):
         self.assertEqual(entry["tags"], ["go"])
         self.assertEqual(entry["relationships"], ["Fury"])
         self.assertTrue(entry["needs_summary"])
+
+    def test_an_accented_filename_matches_a_link_to_it(self):
+        # The note is on disk under a decomposed name (what macOS stores) and
+        # another note links to it composed. Title and relationship must be
+        # equal strings, or every backlink to an accented note is invisible.
+        root = self._vault({
+            unicodedata.normalize("NFD", "Patrícia") + ".md": "ficha",
+            "Railda.md": "sobrinha [Patrícia](<" + unicodedata.normalize("NFC", "Patrícia") + ".md>)",
+        })
+        entries = {e["title"]: e for e in scan(root)}
+        self.assertIn(unicodedata.normalize("NFC", "Patrícia"), entries)
+        self.assertEqual(entries["Railda"]["relationships"],
+                         [unicodedata.normalize("NFC", "Patrícia")])
 
     def test_non_markdown_files_are_ignored(self):
         root = self._vault({"Go.md": "x"})
