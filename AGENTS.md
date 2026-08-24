@@ -90,7 +90,18 @@ knows, so writing the trailer is that agent's job.
 ## Conventions
 
 - Every plugin change bumps `version` in both manifests and adds a `CHANGELOG.md` entry. Both hosts
-  skip updates when the version string is unchanged.
+  skip updates when the version string is unchanged, so a released version edited underneath users
+  is an edit they never receive.
+- **Before a version is released there is nothing to bust.** While it is still unpublished, extend
+  that version's existing `CHANGELOG.md` entry instead of opening a new one — bumping there records
+  a change against something nobody could have installed. Check before you bump:
+
+  ```shell
+  git show origin/main:plugins/<name>/.claude-plugin/plugin.json
+  ```
+
+  An error means the plugin has never been published, so do not bump. If it prints, compare its
+  `version` with the one you are editing; only a version already on `main` needs a new one.
 - A plugin's `name` and the marketplace `name` are stable identifiers. Renaming either breaks
   existing installs; see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 - Use `${CLAUDE_PLUGIN_ROOT}` in hooks and MCP configs — the host expands those itself, and it is

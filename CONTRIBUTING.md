@@ -42,6 +42,11 @@
 Bump `version` in **both** manifests. Both hosts skip the update when the version string is
 unchanged, so a fix shipped without a bump reaches nobody.
 
+One exception, and the check that settles it, live in
+[`AGENTS.md`](./AGENTS.md#conventions): a version that has not reached `main` yet has no installs to
+update, so it is extended rather than bumped. The rule is kept there in one place so this file and
+that one cannot drift apart.
+
 ## Renaming or removing a plugin
 
 A plugin's `name` is its stable identifier — users reference it in their settings and install
