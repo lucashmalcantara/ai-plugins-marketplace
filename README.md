@@ -60,6 +60,7 @@ reasoning and the source links.
 make new NAME=my-plugin   # scaffold plugins/my-plugin
 make validate             # check manifests, skills, and generated files
 make sync                 # regenerate the catalogs and PLUGINS.md
+make test                 # run the plugin script tests
 make check                # what CI runs
 ```
 

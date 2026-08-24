@@ -63,7 +63,27 @@ referenced only from that host's manifest:
 | `PLUGIN_DATA` | — | ✅ |
 | `CLAUDE_PROJECT_DIR` | ✅ | — |
 
-Prefer `${CLAUDE_PLUGIN_ROOT}` in anything shared — it is the only one both hosts define.
+This table is the single source of truth for the mapping. A new provider is a new row here, plus the
+one expression below — nothing else in a plugin should know a host's name.
+
+**In hooks, `.mcp.json`, and anything else the host expands itself:** use `${CLAUDE_PLUGIN_ROOT}`.
+Both hosts define it, and the host substitutes it before anything runs, so a fallback has nowhere to
+go.
+
+**In a skill body:** use the fallback form, because a SKILL.md is prose an agent reads and runs, and
+it has to keep working on a host that is not in the table yet.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/thing.py"
+```
+
+Then say once, in the skill, what to do when neither is set: derive the plugin root from the
+SKILL.md's own directory (`skills/<name>/` is two levels down from the plugin root). An agent always
+knows the path of the skill it just loaded, so that fallback needs no host support at all.
+
+**Keep the variable out of the scripts themselves.** A script can find its own directory from
+`__file__` (or `$0`), and should read only variables the plugin itself defines and documents. Then
+host knowledge lives in exactly one line per skill instead of spreading through the implementation.
 
 ## Practical guidance
 

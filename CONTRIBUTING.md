@@ -42,6 +42,11 @@
 Bump `version` in **both** manifests. Both hosts skip the update when the version string is
 unchanged, so a fix shipped without a bump reaches nobody.
 
+One exception, and the check that settles it, live in
+[`AGENTS.md`](./AGENTS.md#conventions): a version that has not reached `main` yet has no installs to
+update, so it is extended rather than bumped. The rule is kept there in one place so this file and
+that one cannot drift apart.
+
 ## Renaming or removing a plugin
 
 A plugin's `name` is its stable identifier — users reference it in their settings and install
@@ -72,5 +77,6 @@ they run on the system Python that ships with macOS and on any CI image.
 | --- | --- |
 | `make validate` | Validate the marketplace and every plugin |
 | `make sync` | Regenerate the catalogs and `PLUGINS.md` |
-| `make check` | Fail on stale generated files, then validate — what CI runs |
+| `make test` | Run every `plugins/*/scripts/test_*.py` |
+| `make check` | Fail on stale generated files, then validate and test — what CI runs |
 | `make new NAME=x` | Scaffold `plugins/x` |

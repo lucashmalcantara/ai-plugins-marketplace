@@ -21,6 +21,9 @@ jobs:
       - name: Validate marketplace and plugins
         run: python3 scripts/validate.py
 
+      - name: Plugin script tests
+        run: make test
+
       - name: Validate with the Claude Code CLI
         run: |
           npm install -g @anthropic-ai/claude-code
