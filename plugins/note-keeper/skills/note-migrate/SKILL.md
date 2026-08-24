@@ -41,8 +41,8 @@ exports neither, take the directory holding this SKILL.md and go two levels up: 
 `scripts/` in the plugin root, and they read no host variable themselves.
 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
-`sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
-`timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
+`sessions`, `index_dir`, `index_file`), and the vault's `language` and `timezone` — already
+resolved, so use what it prints. A non-zero exit means no vault was found — tell the user to set
 `NOTE_KEEPER_VAULT`, or to set one up with the `note-setup` skill.
 **Never guess where the vault is.**
 
@@ -162,10 +162,10 @@ notes have NO frontmatter** — everything meaningful moves inline; the rest is 
     non-image renders as a broken image everywhere. Flag in the plan that it needs the original app.
 - **Frontmatter `tags:` → inline `#tags`.** Emit them inline in the body (a trailing `#tag #tag`
   line is fine, per the `note` skill).
-- **Apply the vault's writing conventions:** body written in the vault's configured `language`
-  (default `pt-BR`), with English terms in _italics_ (or whichever language counts as "foreign",
-  relative to the vault's configured language). The `note` skill owns these rules — follow them,
-  don't restate them.
+- **Apply the vault's writing conventions:** body written in the vault's configured `language`,
+  with terms foreign to that language in _italics_. A source note written in another language gets
+  translated; what counts as "foreign" is relative to the vault, not to the source. The `note`
+  skill owns these rules — follow them, don't restate them.
 - **Other frontmatter fields are discarded** (e.g. `title:`, `date:`, `aliases:`, `cssclass:`,
   `publish:`, custom keys). Record each dropped field **per source note** for the plan's report.
 

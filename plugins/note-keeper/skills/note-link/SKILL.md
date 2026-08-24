@@ -26,8 +26,8 @@ exports neither, take the directory holding this SKILL.md and go two levels up: 
 `scripts/` in the plugin root, and they read no host variable themselves.
 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
-`sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
-`timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
+`sessions`, `index_dir`, `index_file`), and the vault's `language` and `timezone` — already
+resolved, so use what it prints. A non-zero exit means no vault was found — tell the user to set
 `NOTE_KEEPER_VAULT`, or to set one up with the `note-setup` skill.
 **Never guess where the vault is.**
 

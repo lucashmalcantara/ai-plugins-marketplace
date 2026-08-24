@@ -32,8 +32,8 @@ exports neither, take the directory holding this SKILL.md and go two levels up: 
 `scripts/` in the plugin root, and they read no host variable themselves.
 
 It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `templates`,
-`sessions`, `index_dir`, `index_file`), and the vault's `language` (default `pt-BR`) and
-`timezone` (default `-03:00`). A non-zero exit means no vault was found — tell the user to set
+`sessions`, `index_dir`, `index_file`), and the vault's `language` and `timezone` — already
+resolved, so use what it prints. A non-zero exit means no vault was found — tell the user to set
 `NOTE_KEEPER_VAULT`, or to set one up with the `note-setup` skill.
 **Never guess where the vault is.**
 
@@ -64,9 +64,9 @@ It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `temp
   Every `capture` call appends one new `##` heading with the current timestamp — entries are never
   merged into a previous heading, even if seconds apart, so the transcript stays ordered and
   attributable.
-- **Timestamps are ISO 8601 with an explicit offset, using the vault's configured `timezone`
-  (default `-03:00`)**, both in frontmatter and in entry headings. If the user is capturing from a
-  different timezone, use the correct offset instead of forcing the vault's default.
+- **Timestamps are ISO 8601 with an explicit offset, using the vault's configured `timezone`**,
+  both in frontmatter and in entry headings. If the user is capturing from a different timezone,
+  use the correct offset instead of forcing the vault's default.
 - **Attachments** referenced from a session (screenshots, recordings, shared docs) go in the shared
   `_attachments/` folder, same as attachments referenced from notes.
 
@@ -105,7 +105,7 @@ Append what's happening, **faithfully** — this is a transcript, not a summary:
 1. Read the active-session pointer; resolve the session file. Error out per the rule above if
    there's no valid pointer.
 2. Turn the input into a new `##` heading (current ISO 8601 timestamp, using the vault's configured
-   timezone — default `-03:00`) followed by bullet points.
+   timezone) followed by bullet points.
 3. **Lightly organize, never summarize:** break rambling speech into bullets, fix obvious
    transcription noise, group bullets that clearly belong together under the one heading — but do
    not condense, paraphrase away detail, or drop information because it seems minor. Summarizing is
@@ -161,8 +161,8 @@ deleted session was this agent's active one, clear the active-session pointer.
   here — `topic`/`status`/`started_at`/`ended_at` are exactly what makes a session resumable.
 - **Capture is faithful, never summarized.** Lightly organizing rambling input into bullets is fine;
   compressing or dropping content is not. Summarizing only happens once, at `end`.
-- **Timestamps are ISO 8601 with an explicit offset, using the vault's configured timezone (default
-  `-03:00`)** — both frontmatter fields and entry headings.
+- **Timestamps are ISO 8601 with an explicit offset, using the vault's configured `timezone`** —
+  both frontmatter fields and entry headings.
 - **`_sessions/` is never indexed.** The `note-index` skill only scans `notes/`; don't expect a
   session to show up in `INDEX.md`, and don't route session content through the indexing workflow.
 - **The active-session pointer lives in scratch space, not the vault.** It's per-agent, disposable,
