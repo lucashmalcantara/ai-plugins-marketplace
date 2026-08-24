@@ -37,13 +37,13 @@ It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `temp
 A template is a **pure Markdown file with no frontmatter** — same absence-of-metadata rule as a note
 (see the `note` skill for the note format this mirrors).
 
-- **Filename = what it represents, with spaces**, e.g. `_templates/Reunião.md`, `_templates/Base.md`.
+- **Filename = what it represents, with spaces**, e.g. `_templates/Meeting.md`, `_templates/Base.md`.
   There is no `title` field; the filename *is* the template's name, offered as-is to the user by the
   `note` skill's create workflow.
-- **Body is pure Markdown, no frontmatter.** No `title:`, `tags:`, or `rel:` block — nothing above the
-  content.
+- **Body is pure Markdown, no frontmatter.** No `title:` field, no tag list, no list of related
+  notes — nothing above the content.
 - **May contain:**
-  - Section headings (`## Participantes`, `## Decisões`, etc.) that scaffold the note's structure.
+  - Section headings (`## Attendees`, `## Decisions`, etc.) that scaffold the note's structure.
   - Guide text (short prompts/instructions for whoever fills the template in) written as plain prose
     or placeholder lines.
   - Placeholder inline `#tags` suggesting what the resulting note should be tagged with.
@@ -65,10 +65,10 @@ A template is a **pure Markdown file with no frontmatter** — same absence-of-m
 
 Given the user's intent (what kind of note this template scaffolds, e.g. "meeting notes", "postmortem"):
 
-1. **Pick the filename** — what the template represents, with spaces, e.g. `Reunião.md`,
+1. **Pick the filename** — what the template represents, with spaces, e.g. `Meeting.md`,
    `Postmortem.md`. Ask the user if it's ambiguous.
 2. **Draft the skeleton**: section headings that capture the structure the user wants (e.g.
-   `## Participantes`, `## Decisões`), optionally short guide text under a heading, and any
+   `## Attendees`, `## Decisions`), optionally short guide text under a heading, and any
    placeholder `#tags` that make sense as defaults. No frontmatter, no wikilinks.
 3. **Write it to `_templates/<Name>.md`.**
 4. **Do not touch the index** — templates are out of the `note-index` skill's scope; there is no

@@ -13,7 +13,7 @@ All notable changes to this plugin are documented here. This project follows
   Link rules cover the two destinations that fail silently: a spaced
   filename needs angle brackets, and a `#` in the title must be encoded as
   `%23` — angle brackets do not stop the destination from being read as a
-  URL, so `<Tipos em C#.md>` points at a fragment of a file that isn't there.
+  URL, so `<C# Records.md>` points at a fragment of a file that isn't there.
   Emphasis around a span ending in a URL uses `*`: `_` is not a closer after a
   word character, so it pairs its markers inside the link and breaks both.
 - `note-view` skill: displays a note in read-only mode.

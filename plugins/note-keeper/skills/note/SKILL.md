@@ -33,58 +33,59 @@ It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `temp
 
 A note is a **pure Markdown file with no frontmatter** — the file is just its content.
 
-- **Filename = the title, with spaces**, e.g. `notes/Repasse Custos.md`. There is no `title` field;
+- **Filename = the title, with spaces**, e.g. `notes/Rate Limiting.md`. There is no `title` field;
   the filename *is* the title. Avoid parentheses in new filenames (existing ones with parentheses
   still work via angle brackets — see links below).
-- **Body is in the vault's `language`** (default `pt-BR`). Terms foreign to that language — English
-  terms in a pt-BR vault — are written in _italics_ (e.g. _trade-off_, _deadline_).
+- **Body is in the vault's `language`.** Terms foreign to that language are written in _italics_ —
+  in a vault whose language is not English, that is where _trade-off_ or _deadline_ would go.
   Use `*asterisks*` instead when the emphasized span ends in a URL or already contains `_`: an
-  underscore is not a closer directly after a word character, so `_…?si=1J1W6_tKsB5nzg5p_` pairs its
-  markers inside the URL and both the emphasis and the link come out wrong.
+  underscore is not a closer directly after a word character, so `_see https://example.com/a_b_c_`
+  pairs its markers inside the URL and both the emphasis and the link come out wrong.
 - **Tags are inline `#tag`**, written directly in the body wherever relevant. A trailing line of
   tags at the end of the note is a fine convention:
   ```markdown
-  #post-pricing #seller-agreements
+  #runbook #on-call
   ```
   A tag is `#` immediately followed by a letter (nesting with `-`/`/` is allowed, e.g.
-  `#post-pricing/custos`). `# Heading` (space after `#`) is a heading, not a tag — don't confuse the
+  `#runbook/database`). `# Heading` (space after `#`) is a heading, not a tag — don't confuse the
   two. Don't tag inside code spans/fences or as part of a URL fragment.
 - **Prefer a link over a tag for a relationship.** If the thing you'd tag has its own note, reference
-  it with a link instead — inline, or via a `## Referências` section — not `#fury`. Relationships
-  between notes are carried by links; reserve tags for genuine categories or facets that have no note
-  of their own (e.g. `#dados-sensiveis`, `#runbook`, `#pessoas`). Use a tag only when it really adds a
-  facet a link can't.
+  it with a link instead — inline, or via the references section below — not `#api-gateway`.
+  Relationships between notes are carried by links; reserve tags for genuine categories or facets
+  that have no note of their own (e.g. `#sensitive`, `#runbook`, `#people`). Use a tag only when it
+  really adds a facet a link can't.
 - **Relationships are Markdown links to other notes**, inline in the prose wherever the text
   naturally names the other note — a note's relationships *are* the notes it links to:
   ```markdown
-  ...contratos de [Seller Agreements](<Seller Agreements.md>), gerindo a escala de
-  [transações](<Payment.md>)...
+  ...requests are throttled by [Rate Limiting](<Rate Limiting.md>) before they reach the
+  [gateway](<API Gateway.md>)...
   ```
   When the relationship is real but the prose gives no natural anchor (e.g. a how-to whose subject
-  note is never named in the text), put the link in a trailing **`## Referências`** section instead
-  of forcing an artificial mention or leaving only a tag:
+  note is never named in the text), put the link in a trailing **references section** instead of
+  forcing an artificial mention or leaving only a tag. Name that heading in the vault's `language`
+  — `## References`, `## Referências`, `## Referencias` — and keep the same name across the vault:
   ```markdown
-  ## Referências
+  ## References
 
-  - [Fury](<Fury.md>)
+  - [API Gateway](<API Gateway.md>)
   ```
-  Prefer inline; use `## Referências` only as that fallback, and never repeat there a link that
-  already appears inline — a relationship lives in exactly one place.
+  Prefer inline; use the references section only as that fallback, and never repeat there a link
+  that already appears inline — a relationship lives in exactly one place.
   - Links are **relative to the note itself** (notes live flat in `notes/`, so no `notes/` prefix —
     just the target filename).
   - **Wrap the destination in angle brackets `<...>`** whenever the filename has a space (or other
     characters CommonMark can't take unbracketed) — `[text](<Other Note.md>)`. This is required, not
     optional: an unbracketed destination cannot contain spaces.
   - **A `#` in the title must be written `%23` in the destination.** Angle brackets do not save it:
-    the destination is still read as a URL, so `<Tipos em C#.md>` resolves to the file `Tipos em C`
-    with the fragment `.md`, and the link silently goes nowhere. Write
-    `[Tipos em C#](<Tipos em C%23.md>)` — the link *text* keeps the real `#`, only the destination
+    the destination is still read as a URL, so `<C# Records.md>` resolves to the file `C` with the
+    fragment ` Records.md`, and the link silently goes nowhere. Write
+    `[C# Records](<C%23 Records.md>)` — the link *text* keeps the real `#`, only the destination
     encodes it. This is what Obsidian writes on its own, and the index generator percent-decodes,
     so both ends agree.
   - A link to a note that doesn't exist yet is acceptable — it flags a topic to develop later.
 
-No other metadata exists. Do not add frontmatter, a `title:` field, a `tags:` list, or a `rel:`
-list — all of that lives inline in the body instead.
+No other metadata exists. Do not add frontmatter — no `title:` field, no tag list, no list of
+related notes. All of that lives inline in the body instead.
 
 ## Choosing the destination
 
@@ -93,7 +94,7 @@ Resolve which workflow to run before writing:
 
 - **Target given** — the user references an existing note, either as a file path (`notes/<Title>.md`)
   or by naming it in the request. Go straight to the **Edit workflow** on that note.
-- **No target, but a bare title with no content** (e.g. "note: Repasse Custos") — this is an
+- **No target, but a bare title with no content** (e.g. "note: Rate Limiting") — this is an
   unambiguous **create**. Skip the matching below and run the **Create workflow**.
 - **No target, with content to place** — decide between an existing note and a new one *before*
   writing:
@@ -116,9 +117,9 @@ Resolve which workflow to run before writing:
    inline `#tags`, and inline links to related notes per the format above.
 4. **Review links.** Before updating the index, scan the note body for any proper noun, system name,
    tool name, command prefix, or concept mentioned in plain text that has its own note in the vault —
-   and add the missing links. This is easy to miss when writing command-heavy notes (e.g. `fury
-   ai assets` mentions Fury but the word may never appear as a standalone link target). Check
-   `.index/INDEX.md` titles if unsure whether a note exists.
+   and add the missing links. This is easy to miss when writing command-heavy notes: a line like
+   `kubectl rollout status` names Kubernetes, but the word itself may never appear as a standalone
+   link target. Check `.index/INDEX.md` titles if unsure whether a note exists.
 5. **Update the index.** Run the `note-index` skill in **single-note mode** for `<Title>` so its line
    in `INDEX.md` reflects the new note.
 
@@ -148,19 +149,20 @@ Resolve which workflow to run before writing:
 
 ## Common mistakes
 
-- Adding frontmatter (`title:`, `tags:`, `rel:`) to a note — notes have none; everything is inline.
+- Adding frontmatter of any kind to a note — no `title:`, no tag list, no list of related notes.
+  Notes have none; everything is inline.
 - Writing a link with a spaced filename unbracketed, e.g. `[x](Other Note.md)` — CommonMark can't
   parse the space; use `[x](<Other Note.md>)`.
 - Prefixing links with `notes/` — links are relative to the note's own folder (all notes are flat in
   `notes/`), so the prefix is redundant and wrong.
-- Duplicating a relationship — repeating in a `## Referências` section a link that already appears
-  inline, or keeping a frontmatter `rel:` list. A relationship lives once: inline where the prose
-  supports it, or in `## Referências` when there's no inline anchor.
-- Tagging a concept that has its own note (e.g. `#fury` when `Fury.md` exists) instead of linking to
-  it — a relationship is a link; tags are only for note-less categories.
-- Writing a system name, tool name, or command prefix in plain text without linking — `fury ai
-  assets` mentions Fury but the word may never appear as a standalone link candidate; catch these
-  with the link-review step before indexing.
+- Duplicating a relationship — repeating in the references section a link that already appears
+  inline, or keeping a frontmatter list of related notes. A relationship lives once: inline where
+  the prose supports it, or in the references section when there's no inline anchor.
+- Tagging a concept that has its own note (e.g. `#api-gateway` when `API Gateway.md` exists) instead
+  of linking to it — a relationship is a link; tags are only for note-less categories.
+- Writing a system name, tool name, or command prefix in plain text without linking — a line like
+  `kubectl rollout status` names Kubernetes, but the word may never appear as a standalone link
+  candidate; catch these with the link-review step before indexing.
 - Forgetting the single-note `note-index` update after create/edit — `INDEX.md` is generated and will
   go stale otherwise.
 - Introducing new filenames with parentheses — avoid them going forward, even though angle brackets

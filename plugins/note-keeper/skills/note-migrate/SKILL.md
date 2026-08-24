@@ -73,8 +73,9 @@ For every source `.md` file (after the ignore filter):
 1. Read the whole file: its frontmatter (if any) and its body.
 2. Determine **what the note is actually about** — its subject and key points — not just its
    filename. The vault destination need not mirror the source's name or structure.
-3. Note the raw materials that will need converting: `[[wikilinks]]`, `![[embeds]]`, frontmatter
-   `tags:`, frontmatter `rel:` (or any relationship list), and any other frontmatter fields.
+3. Note the raw materials that will need converting: `[[wikilinks]]`, `![[embeds]]`, a frontmatter
+   tag list, a frontmatter list of related notes (the key varies by source vault), and any other
+   frontmatter fields.
 
 ## Step 2 — Decide merge vs create (semantic consolidation)
 
@@ -103,10 +104,11 @@ accumulates notes that are nothing but frontmatter — a title someone linked to
 The body is empty, but the note is not worthless: its **title and its inbound links are the
 content**, and dropping it silently deletes a piece of the graph the user built. Classify each one:
 
-- **It has inbound links, outbound `rel:`, or both** — keep it, as a note whose body carries only
-  those relationships, written from what the rest of the corpus already states (`Rayane` is named as
-  Railda's daughter in Railda's note). Restating an existing fact is not invention; asserting a new
-  one is. If nothing in the corpus says anything about it, keep the note with just its links.
+- **It has inbound links, outbound ones, or both** — keep it, as a note whose body carries only
+  those relationships, written from what the rest of the corpus already states. If one note says
+  "successor to X" and X's own note is empty, X's note can say it is the predecessor: restating an
+  existing fact is not invention, while asserting a new one is. If nothing in the corpus says
+  anything about it, keep the note with just its links.
 - **It has no links in either direction and no body** — nothing survives it. Propose dropping it,
   and list it in the plan under what will not be migrated.
 
@@ -119,7 +121,7 @@ For each destination, work out how the source content becomes vault-format conte
 notes have NO frontmatter** — everything meaningful moves inline; the rest is dropped and reported.
 
 - **Relationships → inline Markdown links.** Every relationship — a body `[[Target]]` /
-  `[[target|alias]]` wikilink, a frontmatter `rel:` entry, or any relationship list — becomes an
+  `[[target|alias]]` wikilink, or an entry in a frontmatter list of related notes — becomes an
   inline link: `[[Target]]` → `[Target](<Target.md>)`, `[[target|alias]]` → `[alias](<Target.md>)`.
   Relationships live *only* as inline links in the body — never as a separate list or frontmatter
   block. The destination is the *vault* note the link points to — resolve it through this same plan
@@ -129,9 +131,11 @@ notes have NO frontmatter** — everything meaningful moves inline; the rest is 
   restate them, apply them.
 - **A wikilink carrying `#` points at a heading, not at a note.** Two forms, and the difference
   matters because treating either as a plain note link sends the reader to the wrong file:
-  - `[[#Anexo 1]]` — **same note**. It becomes an ordinary anchor: `[Anexo 1](#anexo-1)`. It is not
-    a relationship at all, so it never turns into a note link and never counts as a link to develop.
-  - `[[Nota#Seção]]` — another note's heading: `[Seção](<Nota.md#seção>)`. This *is* a relationship.
+  - `[[#Appendix 1]]` — **same note**. It becomes an ordinary anchor: `[Appendix 1](#appendix-1)`.
+    It is not a relationship at all, so it never turns into a note link and never counts as a link
+    to develop.
+  - `[[Other Note#Section]]` — another note's heading: `[Section](<Other Note.md#section>)`. This
+    *is* a relationship.
 
   Slugify the anchor the way the destination renders headings (lowercase, spaces to `-`), and
   remember that a split can move the target heading into a different note — resolve the anchor
@@ -148,8 +152,8 @@ notes have NO frontmatter** — everything meaningful moves inline; the rest is 
     The text after `|` is the caption — it becomes the image's alt text. Dropping it loses the only
     description the image has.
   - **An accented name that compares unequal to itself.** macOS stores filenames decomposed and
-    hands them back that way, while the name written inside the note is composed — `Técnica` is one
-    code point in the note and two on disk. Normalize both sides to NFC before matching, or every
+    hands them back that way, while the name written inside the note is composed — the `é` in
+    `Café` is one code point in the note and two on disk. Normalize both sides to NFC before matching, or every
     accented attachment reports as missing while sitting right there in the folder.
   - **A target that isn't an image, or carries no extension.** `![[drawing.excalidraw]]` embeds an
     editor-specific asset that renders only in the source app, and the file on disk may be
@@ -182,13 +186,13 @@ A useful shape:
 ```
 Migration plan (source: /path/to/source — READ-ONLY, nothing there will change)
 
-1. source/payments.md
-   → MERGE into "Payment.md"        (topic match: tags #payment, summary overlap)
-   conversions: [[Seller Agreements]] → link; tags: payment, fintech → inline #tags
+1. source/throttling.md
+   → MERGE into "Rate Limiting.md"  (topic match: tag overlap, summary overlap)
+   conversions: [[API Gateway]] → link; tags: infra, http → inline #tags
    dropped frontmatter: title, date, aliases
 
 2. source/idempotency.md
-   → CREATE "Idempotência.md"       (no existing note on this topic)
+   → CREATE "Idempotency.md"        (no existing note on this topic)
    conversions: ![[diagram.png]] → copy to _attachments/, embed as image
    dropped frontmatter: date, cssclass
 
@@ -246,8 +250,9 @@ rebuild in Step 2 happens earlier, before any writes). Do not hand-edit
   into an existing note when the topic already exists.
 - **Force-merging loosely related notes.** When the topic match is weak, create a new note and flag
   it for the user rather than merging.
-- **Carrying frontmatter into the vault.** Resulting notes have none: `tags:` → inline `#tags`,
-  `rel:`/wikilinks → inline links, everything else discarded — and the discards are reported.
+- **Carrying frontmatter into the vault.** Resulting notes have none: a tag list becomes inline
+  `#tags`, a list of related notes and any wikilinks become inline links, everything else is
+  discarded — and the discards are reported.
 - **Leaving wikilinks or embeds unconverted** — `[[…]]` → `[text](<Target.md>)`, `![[…]]` →
   `![](<../_attachments/…>)` with the media copied in.
 - **Reading an embed as `![[basename.ext]]` and nothing else** — a path prefix must be stripped, an

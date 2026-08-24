@@ -63,7 +63,7 @@ It prints JSON: `root`, the absolute folder paths (`notes`, `attachments`, `temp
   user weaves into the body, per the `note` skill's format.
 - **Links follow the note format exactly**: relative to `notes/` (no `notes/` prefix, since notes
   live flat), and wrapped in angle brackets whenever the destination has a space, e.g.
-  `[trade-offs de custo](<Repasse Custos.md>)`.
+  `[request throttling](<Rate Limiting.md>)`.
 - A suggestion pointing at a note that doesn't exist yet is out of scope here — this skill only
   suggests links between notes that are already in `INDEX.md`.
 

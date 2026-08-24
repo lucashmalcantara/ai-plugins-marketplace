@@ -55,10 +55,10 @@ Pick the mode from the shape of the query:
   bodies first**, then also match it against INDEX titles/summaries for topical hits. A note that
   merely *contains* the words — even only in a heading — is a valid hit; don't require it to be
   "about" the topic before returning it.
-- **Tag** — the query is a `#tag` (e.g. `#post-pricing`): filter `INDEX.md`'s `tags:` column. Tags
+- **Tag** — the query is a `#tag` (e.g. `#runbook`): filter `INDEX.md`'s `tags:` column. Tags
   are parsed there authoritatively (no false hits from a `#` inside code spans or URLs), so prefer
-  the index over grepping bodies. A tag query matches nested tags by prefix — `#post-pricing` covers
-  `#post-pricing/custos`.
+  the index over grepping bodies. A tag query matches nested tags by prefix — `#runbook` covers
+  `#runbook/database`.
 - **Backlinks** — "what links to `<Target>`": filter `INDEX.md`'s `relationships:` column for
   `Target` (relationships are the parsed outbound links). This finds the notes that point at the
   target.
@@ -125,9 +125,9 @@ full-text, cite the matching **line** as an editor-at-line link with a short exc
 (tag/summary/backlink) have no line — they carry the title link only.
 
 ```
-1. [Repasse de Custos](<notes/Repasse de Custos.md>) — exact heading at [line 26](file:///ABS/VAULT/notes/Repasse%20de%20Custos.md#L26)
-   > ## Repasse de Custos
-2. [Payment](<notes/Payment.md>) — summary match ("transações")
+1. [Rate Limiting](<notes/Rate Limiting.md>) — exact heading at [line 26](file:///ABS/VAULT/notes/Rate%20Limiting.md#L26)
+   > ## Rate Limiting
+2. [API Gateway](<notes/API Gateway.md>) — summary match ("throttling")
 ```
 
 Then offer next actions: the **`note-view`** skill to read a hit in full, the **`note`** skill to

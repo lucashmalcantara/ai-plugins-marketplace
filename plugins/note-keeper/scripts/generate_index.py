@@ -99,9 +99,9 @@ def format_line(entry):
         parts.append("tags: " + ", ".join(entry["tags"]))
     if entry.get("relationships"):
         # Separated by " / ", not ", ": a note title may contain a comma
-        # ("Preposições in, on e at") and a comma-joined list of them cannot be
-        # read back. "/" is the one character a filename cannot hold, so it is
-        # the only separator that stays unambiguous.
+        # ("Newton, Leibniz and the calculus") and a comma-joined list of them
+        # cannot be read back. "/" is the one character a filename cannot hold,
+        # so it is the only separator that stays unambiguous.
         parts.append("relationships: " + " / ".join(entry["relationships"]))
     return " · ".join(parts)
 

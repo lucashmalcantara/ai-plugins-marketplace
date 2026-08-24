@@ -50,7 +50,7 @@ The argument names what to show:
 ## Choosing the scope
 
 - **Whole note (default)** — no scope argument: show the entire body.
-- **A section** — the argument names a heading (e.g. `## Decisões`): show from that heading through
+- **A section** — the argument names a heading (e.g. `## Decisions`): show from that heading through
   the end of its section (up to the next heading of the same or a higher level). If the note has no
   headings — many notes are plain prose — say so and show the whole note.
 - **A line range or excerpt** — e.g. `10-25` for those lines, or a request like "the first lines":
