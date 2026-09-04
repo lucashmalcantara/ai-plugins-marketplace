@@ -112,6 +112,11 @@ creates what every other skill then expects.
 
    - **`conflict` is true** — say which vault is configured now and which would replace it, and get
      a second yes before continuing. Never overwrite a value the user has not seen.
+   - **`shadowed` is also true** — the existing value is a line the user wrote themselves, outside
+     the managed block. Their line is never edited, but the block goes in after it and a later
+     assignment wins, so theirs would stop having any effect while still sitting in the file. Say
+     that plainly and suggest they delete their line, rather than leaving two answers to the same
+     question in one file.
    - **`supported` is false** — the shell or the platform has no flow here. Show the `manual` text
      and stop; write nothing yourself. This is the case on Windows and on any shell other than zsh.
    - **`action` is `unchanged`** — say so and skip the write.

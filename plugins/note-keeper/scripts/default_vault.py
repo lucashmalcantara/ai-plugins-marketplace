@@ -84,23 +84,47 @@ def _find_block(lines):
     return None if start is None or end is None else (start, end)
 
 
-def _current_value(path):
-    """The vault already recorded in the managed block, if there is one."""
-    if not os.path.isfile(path):
+def _assigned_value(line):
+    """The path a line exports, or None if it exports something else."""
+    stripped = line.strip()
+    if not stripped.startswith("export {}=".format(ENV_VAR)):
         return None
+    _, _, value = stripped.partition("=")
+    try:
+        parsed = shlex.split(value)
+    except ValueError:
+        return None
+    return parsed[0] if parsed else None
+
+
+def _existing(path):
+    """What the file already sets the variable to.
+
+    Returns (value, shadowed). A value the user wrote by hand outside the
+    managed block is reported too: the block would be appended after it and win
+    silently, leaving their line in place but dead.
+    """
+    if not os.path.isfile(path):
+        return None, False
     with open(path) as handle:
         lines = handle.read().splitlines()
+
     span = _find_block(lines)
-    if span is None:
-        return None
-    for line in lines[span[0]:span[1] + 1]:
-        stripped = line.strip()
-        if stripped.startswith("export {}=".format(ENV_VAR)):
-            _, _, value = stripped.partition("=")
-            parsed = shlex.split(value)
-            if parsed:
-                return parsed[0]
-    return None
+    inside = range(span[0], span[1] + 1) if span else range(0)
+
+    managed = outside = None
+    for number, line in enumerate(lines):
+        value = _assigned_value(line)
+        if value is None:
+            continue
+        if number in inside:
+            managed = value
+        else:
+            outside = value
+
+    if outside is not None:
+        return outside, True
+    return managed, False
 
 
 def _manual(root, shell_file):
@@ -127,16 +151,20 @@ def plan(vault, home=None, platform=None, shell=None, is_wsl=None):
             "reason": reason,
             "file": None,
             "current": None,
+            "shadowed": False,
             "conflict": False,
             "action": "manual",
             "manual": _manual(root, "your shell's startup file"),
         }
 
     rc = os.path.join(home, ".zshrc")
-    current = _current_value(rc)
-    if current is None:
+    current, shadowed = _existing(rc)
+    # The action describes the managed block alone; a hand-written line outside
+    # it is a conflict to raise, never something this writes over.
+    managed = None if shadowed else current
+    if managed is None:
         action = "create"
-    elif current == root:
+    elif managed == root:
         action = "unchanged"
     else:
         action = "update"
@@ -148,6 +176,7 @@ def plan(vault, home=None, platform=None, shell=None, is_wsl=None):
         "file": rc,
         "block": _block(root),
         "current": current,
+        "shadowed": shadowed,
         "conflict": current is not None and current != root,
         "action": action,
         "manual": _manual(root, rc),

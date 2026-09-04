@@ -49,12 +49,15 @@ class _Case(unittest.TestCase):
         return default_vault.plan(vault or self.vault, **kwargs)
 
     def _exported_value(self):
-        """The path a shell would actually see, parsed rather than string-matched."""
+        """The path a shell would actually see: the last assignment wins."""
+        found = None
         for line in self._read_rc().splitlines():
-            if line.startswith("export NOTE_KEEPER_VAULT="):
-                _, _, value = line.partition("=")
-                return shlex.split(value)[0]
-        raise AssertionError("no export line in {}".format(self._rc()))
+            if line.strip().startswith("export NOTE_KEEPER_VAULT="):
+                _, _, value = line.strip().partition("=")
+                found = shlex.split(value)[0]
+        if found is None:
+            raise AssertionError("no export line in {}".format(self._rc()))
+        return found
 
 
 class TestPlatformRouting(_Case):
@@ -149,6 +152,28 @@ class TestConflict(_Case):
         plan = self._plan()
         self.assertFalse(plan["conflict"])
         self.assertEqual(plan["action"], "unchanged")
+
+    def test_reports_a_hand_written_value_outside_the_block(self):
+        with open(self._rc(), "w") as handle:
+            handle.write('export NOTE_KEEPER_VAULT="/somewhere/else"\n')
+        plan = self._plan()
+        self.assertTrue(plan["conflict"])
+        self.assertEqual(plan["current"], "/somewhere/else")
+        self.assertTrue(plan["shadowed"])
+
+    def test_a_hand_written_line_is_left_in_place(self):
+        with open(self._rc(), "w") as handle:
+            handle.write('export NOTE_KEEPER_VAULT="/somewhere/else"\n')
+        default_vault.apply(self._plan())
+        self.assertIn('export NOTE_KEEPER_VAULT="/somewhere/else"', self._read_rc())
+        self.assertEqual(self._exported_value(), self.vault)
+
+    def test_a_value_inside_the_block_is_not_shadowed(self):
+        default_vault.apply(self._plan())
+        other = self._make_vault("other")
+        plan = self._plan(vault=other)
+        self.assertTrue(plan["conflict"])
+        self.assertFalse(plan["shadowed"])
 
     def test_a_first_run_is_not_a_conflict(self):
         plan = self._plan()
