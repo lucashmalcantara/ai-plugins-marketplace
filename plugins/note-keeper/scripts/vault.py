@@ -360,7 +360,33 @@ def _main(argv=None):
     obsidian.add_argument("--dry-run", action="store_true",
                           help="report what would change, and write nothing")
 
+    # This one plans by default and writes only with --apply: it is the only
+    # command that touches a file outside the vault.
+    default = sub.add_parser("default", help="make a vault the user's default")
+    default.add_argument("path", nargs="?", default=".")
+    default.add_argument("--apply", action="store_true",
+                         help="write the change; without it, only the plan is printed")
+
     args = parser.parse_args(argv)
+
+    if args.cmd == "default":
+        import default_vault
+        try:
+            plan = default_vault.plan(args.path)
+        except ValueError as exc:
+            print("error: {}".format(exc), file=sys.stderr)
+            return 1
+        if args.apply:
+            try:
+                default_vault.apply(plan)
+            except default_vault.Unsupported as exc:
+                print("error: {}".format(exc), file=sys.stderr)
+                return 1
+            plan["written"] = True
+        else:
+            plan["written"] = False
+        print(json.dumps(plan, ensure_ascii=False, indent=2))
+        return 0
 
     if args.cmd == "inspect":
         print(json.dumps(inspect_path(args.path), ensure_ascii=False, indent=2))

@@ -3,6 +3,16 @@
 All notable changes to this plugin are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-09-04
+
+### Added
+
+- `note-setup` can make a vault the user's default, persisting `NOTE_KEEPER_VAULT` in a managed
+  block in `~/.zshrc` so the vault resolves from any directory. It plans first and writes only
+  after approval, reports a conflict when the variable already points elsewhere, and re-running it
+  replaces the block instead of adding another. Only zsh is written to; every other shell — and
+  Windows — gets instructions to apply by hand.
+
 ## [0.1.0] - 2026-08-23
 
 ### Added

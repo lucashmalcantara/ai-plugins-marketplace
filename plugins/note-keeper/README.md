@@ -7,7 +7,7 @@ connections, not in a folder hierarchy.
 
 | | |
 | --- | --- |
-| Components | 10 skills, 2 scripts |
+| Components | 10 skills, 3 scripts |
 | Works on | Claude Code, Codex |
 | Requires | Python 3.9+; `ripgrep` optional (falls back to `grep`) |
 
@@ -46,6 +46,11 @@ The layout it creates:
 ├── _sessions/           live capture buffers
 └── .index/              generated map — INDEX.md and cache.json
 ```
+
+Afterwards it offers to make the vault your default, writing `NOTE_KEEPER_VAULT` into a managed
+block in `~/.zshrc` so the vault resolves from any directory. It asks first, shows the exact change,
+and tells you if the variable already points somewhere else. Only zsh is written to — any other
+shell, and Windows, get the line to add by hand.
 
 The same thing without an agent:
 
@@ -154,10 +159,13 @@ so the next `note-index` rebuild picks up whatever appeared while you were away.
 
 ## Scripts
 
-Both are stdlib-only Python.
+All three are stdlib-only Python.
 
 - **`scripts/vault.py`** — resolves the vault and its settings, printing them as JSON; `init`
   scaffolds a new one.
+- **`scripts/default_vault.py`** — persists `NOTE_KEEPER_VAULT` in a managed block in `~/.zshrc`,
+  reached through `vault.py default`. It plans by default and writes only with `--apply`, since it
+  is the one script that touches a file outside the vault.
 - **`scripts/generate_index.py`** — the deterministic half of `note-index`: parses inline tags and
   outbound links, hashes bodies to reuse cached summaries, and renders `INDEX.md`. `scan` reports
   which notes need a fresh summary; `write --summaries <file>` merges the ones the agent wrote and
