@@ -91,13 +91,44 @@ creates what every other skill then expects.
 7. **Build the first index.** Hand off to the `note-index` skill (full rebuild) if the vault has any
    notes — including ones just moved in. An empty vault has nothing to index; say so and skip it.
 
-8. **Tell the user how the vault will be found**, then stop. Resolution order is
-   `$NOTE_KEEPER_VAULT`, then a `.note-keeper.json` up the tree, then a `notes/` folder up the tree.
-   Working outside the vault means exporting it:
+8. **Tell the user how the vault will be found.** Resolution order is `$NOTE_KEEPER_VAULT`, then a
+   `.note-keeper.json` up the tree, then a `notes/` folder up the tree. Inside the vault it is
+   found on its own; from anywhere else, only the variable answers.
 
-   ```shell
-   export NOTE_KEEPER_VAULT="<path>"
+9. **Offer to make it the default**, then stop. Ask once — *make this vault the default for your
+   user?* — and take silence or a no as a no. Nothing below runs unasked.
+
+   Show the plan first. This writes nothing:
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py" default "<path>"
    ```
+
+   The JSON says what would happen: `supported` (whether this shell can be written to at all),
+   `file`, `action` (`create`, `update`, `unchanged`, or `manual`), `block` (the exact text), and
+   `current` with `conflict` when the variable already points somewhere else.
+
+   Present it, then act on what came back:
+
+   - **`conflict` is true** — say which vault is configured now and which would replace it, and get
+     a second yes before continuing. Never overwrite a value the user has not seen.
+   - **`supported` is false** — the shell or the platform has no flow here. Show the `manual` text
+     and stop; write nothing yourself. This is the case on Windows and on any shell other than zsh.
+   - **`action` is `unchanged`** — say so and skip the write.
+
+   Only with approval, and only then:
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/vault.py" default "<path>" --apply
+   ```
+
+   It edits one managed block in `~/.zshrc`, delimited by `# >>> Note Keeper Plugin (managed) >>>`,
+   and leaves the rest of the file and its permissions alone. Re-running it replaces that block
+   rather than adding another.
+
+   Then say how to pick it up, and do not do any of it yourself: the current shell needs
+   `source ~/.zshrc`, a new terminal gets it on its own, and Claude Code or Codex must be restarted
+   because a running process keeps the environment it started with.
 
 ## Obsidian
 

@@ -5,7 +5,7 @@
 | Plugin | Version | Description | Claude Code | Codex |
 | --- | --- | --- | --- | --- |
 | [Commit Craft](./plugins/commit-craft) | 0.2.0 | Turns staged changes into well-scoped Conventional Commits messages. | ✅ | ✅ |
-| [Note Keeper](./plugins/note-keeper) | 0.1.0 | Personal knowledge vault of plain-Markdown notes: create, view, search, link, index, and distil them. | ✅ | ✅ |
+| [Note Keeper](./plugins/note-keeper) | 0.2.0 | Personal knowledge vault of plain-Markdown notes: create, view, search, link, index, and distil them. | ✅ | ✅ |
 
 Install with `/plugin install <name>@lucashmalcantara-plugins` in Claude Code, or enable the plugin
 from `/plugins` in Codex. See the [README](./README.md) for the marketplace setup step.

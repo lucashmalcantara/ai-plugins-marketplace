@@ -1,6 +1,6 @@
 {
   "name": "note-keeper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal knowledge vault of plain-Markdown notes: create, view, search, link, index, and distil them.",
   "author": {
     "name": "Lucas Alcantara",
