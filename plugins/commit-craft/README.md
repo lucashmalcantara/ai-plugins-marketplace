@@ -37,3 +37,9 @@ Ask in plain language ("write a commit message for what I staged"), or invoke th
 
 The skill reads `git status`, `git diff --staged`, and recent `git log` history to match the
 repository's existing commit style. It never stages or commits on its own unless you ask it to.
+
+When an agent wrote part of the staged diff, the message it proposes carries a
+`Co-authored-by:` trailer naming that model — the subagent's own model when a subagent wrote the
+code, one trailer per model when several contributed, and none for a model the agent cannot
+identify, which it never guesses at. Work you wrote yourself gets no trailer, and neither does an
+agent that only reviewed the change or ran the commands. You stay the commit author either way.
