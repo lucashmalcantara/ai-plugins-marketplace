@@ -1,6 +1,6 @@
 {
   "name": "commit-craft",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Turns staged changes into well-scoped Conventional Commits messages.",
   "author": {
     "name": "Lucas Alcantara",

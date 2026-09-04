@@ -3,6 +3,22 @@
 All notable changes to this plugin are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-09-04
+
+### Changed
+
+- Scope selection: the scope now comes from what the staged paths have in common — a plugin,
+  package, or module directory names the scope, preferring one the history already uses, and only
+  a genuinely cross-cutting change goes without. Ambiguous cases are put to the user rather than
+  guessed at. It was previously optional with no procedure for deciding, which let a change
+  belonging to an obvious domain commit without one.
+
+### Added
+
+- A pre-commit check: the message is written to a file, verified line by line against the rules
+  the skill states, and committed with `git commit -F` so the text that was checked is the text
+  that lands.
+
 ## [0.1.1] - 2026-09-04
 
 ### Fixed

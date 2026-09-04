@@ -14,13 +14,18 @@ Produce commit messages that describe **why** a change was made, in
    - `git status --short`
    - `git diff --staged`
    - If nothing is staged, say so and ask whether to stage everything.
-2. Read the last few messages with `git log --oneline -10` and match the repository's
-   existing style (scope vocabulary, casing, whether a body is customary).
+2. Read the last few messages with `git log --oneline -20` and match the repository's
+   existing style — casing, whether a body is customary, and above all which scopes it
+   already uses. That vocabulary decides the next step.
 3. Decide whether the staged diff is one logical change. If it mixes unrelated concerns,
    propose a split and list which files belong to each commit. Do not stage or commit
    anything on your own unless the user asked you to.
-4. Write the message, attributing every model that wrote part of the staged diff — see
+4. Choose the scope from what the staged paths have in common — see
+   [Choosing a scope](#choosing-a-scope).
+5. Write the message, attributing every model that wrote part of the staged diff — see
    [Co-authorship](#co-authorship).
+6. Check it and commit the text you checked — see
+   [Before committing](#before-committing).
 
 ## Message format
 
@@ -33,7 +38,9 @@ Produce commit messages that describe **why** a change was made, in
 ```
 
 - **type**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
-- **scope**: optional; the module, package, or area touched. Omit it rather than inventing one.
+- **scope**: the plugin, module, package, or domain the change belongs to. Required whenever the
+  staged paths point at one; omitted only for a genuinely cross-cutting change. Never invented —
+  see [Choosing a scope](#choosing-a-scope).
 - **subject**: imperative mood, lowercase, no trailing period, at most 72 characters.
 - **body**: optional; wrap at 72 columns. Explain the motivation and the trade-off, not the diff —
   the reader can already see the diff.
@@ -46,6 +53,59 @@ Produce commit messages that describe **why** a change was made, in
 - Never describe the mechanics ("changed line 42"); describe the effect.
 - A commit that only reformats code is `style`; a commit that changes behavior is never `style`.
 - If the change is a revert, use `revert:` and reference the reverted commit SHA.
+
+## Choosing a scope
+
+The staged paths decide the scope, not the subject. Look at what they have in common:
+
+- **All under one plugin, package, or top-level module** — its directory name is the scope.
+  `plugins/note-keeper/...` gives `note-keeper`; `src/billing/...` gives `billing`.
+- **Spread across one domain** without a single directory — name the domain, if the history
+  already recognises it.
+- **Spread across unrelated areas** — the change is cross-cutting; write no scope. A
+  repository-wide rename, or a build change touching everything, is the honest case for omitting
+  it.
+
+Two rules bound the choice:
+
+- **Prefer a scope the history already uses.** The vocabulary from step 2 is evidence; a scope
+  nobody has used before needs evidence of its own — a directory or package that actually exists
+  in the diff. Never coin a scope to describe the change; that is what the subject is for.
+- **When more than one scope is plausible, ask.** List the candidates with the files behind each
+  and let the user pick, rather than guessing and committing.
+
+Omitting the scope is a decision about the diff, not a way out of making one. If the staged files
+sit under a single directory, that directory is the scope.
+
+## Before committing
+
+Write the finished message to a file and check it there. Every rule below is a rule this skill
+already states; the point of the file is that the text can be checked and then committed
+unchanged.
+
+```shell
+awk 'length > 72 {print FILENAME": line "FNR" is "length" chars"}' <message-file>
+```
+
+Silence means every line fits. Any output is a line to rewrap before going further.
+
+Then read the message once against the rest:
+
+- the type is one of the types listed above;
+- the scope follows [Choosing a scope](#choosing-a-scope) — present when the paths point at one;
+- the subject is imperative, lowercase, and carries no trailing period;
+- the body explains motivation or effect, and never narrates the diff line by line;
+- a blank line separates subject, body, and footer;
+- `BREAKING CHANGE:` is present if the change is incompatible.
+
+Commit the file itself:
+
+```shell
+git commit -F <message-file>
+```
+
+Never retype the message into `git commit -m`. Retyping is where a checked message and a committed
+message drift apart, and the commit is the copy that survives.
 
 ## Co-authorship
 
@@ -78,7 +138,9 @@ provider: `noreply@anthropic.com` for Claude models, `noreply@openai.com` for Op
 
 The human stays the commit `Author`; a trailer adds a co-author and never replaces them.
 
-## Example
+## Examples
+
+Every staged file lived under `src/auth/`, so the scope is `auth`:
 
 ```
 fix(auth): refresh the session token before long uploads
@@ -93,3 +155,13 @@ Co-authored-by: Claude Sonnet 5 <noreply@anthropic.com>
 
 That trailer names one model because a real commit names one. Yours names whichever model actually
 wrote the change, read from the session — not the name above.
+
+This one raised the Node version in the CI workflow, the Dockerfile, and three package manifests
+at once. No directory contains the change, so it carries no scope:
+
+```
+build: raise the minimum Node version to 20
+
+18 reached end of life in April, and the test matrix had been pinning
+20 for months anyway. Make the manifests say what CI already runs.
+```
