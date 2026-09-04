@@ -3,6 +3,26 @@
 All notable changes to this plugin are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-09-04
+
+### Changed
+
+- Scope selection: the scope was optional with no procedure for deciding it, which let a change
+  belonging to an obvious domain commit without one. It now follows from the staged paths — a
+  plugin, package, or module directory names the scope, preferring one the history already uses,
+  and only a genuinely cross-cutting change goes without. Ambiguous cases are put to the user
+  rather than guessed at.
+- Ticket ids outrank the code area: an id read from the branch name or from the conversation takes
+  the scope — `fix(PROJ-1234): ...` — and the area moves into the subject. An id written in lower
+  case is confirmed with the user first, an ordinary branch name having the same shape, and one is
+  never invented where none exists.
+
+### Added
+
+- A pre-commit check: the message is written to a file, verified line by line against the rules
+  the skill states, and committed with `git commit -F` so the text that was checked is the text
+  that lands.
+
 ## [0.1.1] - 2026-09-04
 
 ### Fixed
