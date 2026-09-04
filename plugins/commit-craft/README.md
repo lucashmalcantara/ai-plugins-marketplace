@@ -38,9 +38,12 @@ Ask in plain language ("write a commit message for what I staged"), or invoke th
 The skill reads `git status`, `git diff --staged`, and recent `git log` history to match the
 repository's existing commit style. It never stages or commits on its own unless you ask it to.
 
-The scope comes from the staged paths: files sitting under one plugin, package, or module take
-that directory's name, preferring a scope the history already uses, and a change spread across
-unrelated areas carries none. When more than one scope fits, the skill asks instead of guessing.
+A ticket id takes the scope when there is one — `fix(PROJ-1234): ...` — read from the branch name
+or from what you have said, never invented. Written in lower case it is ambiguous enough that the
+skill asks before using it. Otherwise the scope comes from the staged paths: files sitting under
+one plugin, package, or module take that directory's name, preferring a scope the history already
+uses, and a change spread across unrelated areas carries none. When more than one scope fits, the
+skill asks instead of guessing.
 Before committing, it writes the message to a file, checks that no line runs past 72 columns, and
 commits that file with `git commit -F` — so the message you approved is the message that lands.
 

@@ -56,7 +56,30 @@ Produce commit messages that describe **why** a change was made, in
 
 ## Choosing a scope
 
-The staged paths decide the scope, not the subject. Look at what they have in common:
+**A ticket id takes the scope when there is one.** Repositories tracked in an issue tracker put
+the ticket between the parentheses, and it outranks the code area — with a ticket in play, the
+area is named in the subject or the body instead:
+
+```
+fix(PROJ-1234): refresh the auth session token before long uploads
+```
+
+Look for the id in the branch name first (`git rev-parse --abbrev-ref HEAD`), then in what the
+user has said. Never read one out of the diff, and never invent one: no id in sight means the
+paths decide, exactly as below.
+
+An id is a project key, a hyphen, and digits — `PROJ-1234`, `AB2-99`:
+
+- **Written in capitals**, it is unambiguous. Use it.
+- **Written in lower case** — `proj-1234-fix-login` — it is plausible, but so is an ordinary
+  branch name: `note-keeper-12` has the same shape. Put the candidate to the user and let them
+  confirm before it becomes the scope.
+
+Anything else is not an id. A GitHub issue reference (`#4`), a branch named `issue-4`, or a bare
+number is a footer reference, never a scope.
+
+Without a ticket, the staged paths decide the scope, not the subject. Look at what they have in
+common:
 
 - **All under one plugin, package, or top-level module** — its directory name is the scope.
   `plugins/note-keeper/...` gives `note-keeper`; `src/billing/...` gives `billing`.
@@ -74,8 +97,11 @@ Two rules bound the choice:
 - **When more than one scope is plausible, ask.** List the candidates with the files behind each
   and let the user pick, rather than guessing and committing.
 
-Omitting the scope is a decision about the diff, not a way out of making one. If the staged files
-sit under a single directory, that directory is the scope.
+Those two rules govern the paths, not the ticket: an id that is actually the ticket for this work
+is evidence enough on its own, however the history reads.
+
+Omitting the scope is a decision about the diff, not a way out of making one. If there is a ticket,
+it is the scope; if the staged files sit under a single directory, that directory is the scope.
 
 ## Before committing
 
@@ -156,8 +182,21 @@ Co-authored-by: Claude Sonnet 5 <noreply@anthropic.com>
 That trailer names one model because a real commit names one. Yours names whichever model actually
 wrote the change, read from the session — not the name above.
 
+The same change on a branch named `PROJ-1234-fix-login`. Every file still sits under `src/auth/`,
+but the ticket outranks it, so `auth` moves into the subject:
+
+```
+fix(PROJ-1234): refresh the auth session token before long uploads
+
+Uploads over ~10 minutes failed with 401 because the token expired
+mid-request. Refresh it when the remaining lifetime is under two
+minutes instead of waiting for the failure.
+
+Refs: PROJ-1234
+```
+
 This one raised the Node version in the CI workflow, the Dockerfile, and three package manifests
-at once. No directory contains the change, so it carries no scope:
+at once. No directory contains the change and no ticket is in play, so it carries no scope:
 
 ```
 build: raise the minimum Node version to 20

@@ -7,11 +7,15 @@ All notable changes to this plugin are documented here. This project follows
 
 ### Changed
 
-- Scope selection: the scope now comes from what the staged paths have in common — a plugin,
-  package, or module directory names the scope, preferring one the history already uses, and only
-  a genuinely cross-cutting change goes without. Ambiguous cases are put to the user rather than
-  guessed at. It was previously optional with no procedure for deciding, which let a change
-  belonging to an obvious domain commit without one.
+- Scope selection: the scope was optional with no procedure for deciding it, which let a change
+  belonging to an obvious domain commit without one. It now follows from the staged paths — a
+  plugin, package, or module directory names the scope, preferring one the history already uses,
+  and only a genuinely cross-cutting change goes without. Ambiguous cases are put to the user
+  rather than guessed at.
+- Ticket ids outrank the code area: an id read from the branch name or from the conversation takes
+  the scope — `fix(PROJ-1234): ...` — and the area moves into the subject. An id written in lower
+  case is confirmed with the user first, an ordinary branch name having the same shape, and one is
+  never invented where none exists.
 
 ### Added
 
