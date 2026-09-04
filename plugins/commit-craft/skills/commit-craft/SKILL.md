@@ -56,16 +56,19 @@ the staged diff, the message carries one trailer per contributing model:
 Co-authored-by: <model display name> <provider noreply address>
 ```
 
-Write the display name the way its host names it — `Claude Opus 5`, `GPT-5.6 Sol` — reading it
-from the session's own metadata rather than assuming, since a session can be switched to another
-model mid-way. Every model name in this skill is a sample of that spelling, the one in the example
-below included; never copy one into a message. The address belongs to the model's provider:
-`noreply@anthropic.com` for Claude models, `noreply@openai.com` for OpenAI models.
+The value is the model and nothing else — not the agent's name, not a subagent's name, not the
+harness. Write the display name the way its host names it — `Claude Opus 5`, `GPT-5.6 Sol` —
+reading it from the session's own metadata rather than assuming, since a session can be switched
+to another model mid-way. Every model name in this skill is a sample of that spelling, the one in
+the example below included; never copy one into a message. The address belongs to the model's
+provider: `noreply@anthropic.com` for Claude models, `noreply@openai.com` for OpenAI models.
 
 - **The agent writing the message** adds its own model whenever it wrote part of the change.
 - **A subagent's work** carries the subagent's model, never the parent's. A subagent committing
   its own work knows that value directly; a parent committing on its behalf copies the one the
-  subagent reported, verbatim.
+  subagent reported, verbatim. A subagent started fresh never read this skill, so spawn one that
+  might commit with the rule already in its prompt — nothing recovers which model it ran on after
+  the fact.
 - **Several contributors** get one trailer each, in the order they worked. Two agents that ran on
   the same model share a single trailer — never repeat a model.
 - **A model that cannot be identified** gets no trailer. Do not infer one from the diff, the
