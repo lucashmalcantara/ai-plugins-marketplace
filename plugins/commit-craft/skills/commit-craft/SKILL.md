@@ -58,8 +58,9 @@ Co-authored-by: <model display name> <provider noreply address>
 
 Write the display name the way its host names it — `Claude Opus 5`, `GPT-5.6 Sol` — reading it
 from the session's own metadata rather than assuming, since a session can be switched to another
-model mid-way. The address belongs to the model's provider: `noreply@anthropic.com` for Claude
-models, `noreply@openai.com` for OpenAI models.
+model mid-way. Every model name in this skill is a sample of that spelling, the one in the example
+below included; never copy one into a message. The address belongs to the model's provider:
+`noreply@anthropic.com` for Claude models, `noreply@openai.com` for OpenAI models.
 
 - **The agent writing the message** adds its own model whenever it wrote part of the change.
 - **A subagent's work** carries the subagent's model, never the parent's. A subagent committing
@@ -86,3 +87,6 @@ minutes instead of waiting for the failure.
 Closes: #481
 Co-authored-by: Claude Sonnet 5 <noreply@anthropic.com>
 ```
+
+That trailer names one model because a real commit names one. Yours names whichever model actually
+wrote the change, read from the session — not the name above.
